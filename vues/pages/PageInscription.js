@@ -46,10 +46,10 @@ export default class PageInscription extends React.Component {
 
   }
   async componentDidMount() {
-    // let idUser =  await getIdUser() ;
-    // if (idUser) {
-    //   this.goToPageActivation({data : {id : idUser}})
-    // }
+    let idUser =  await getIdUser() ;
+    if (idUser) {
+      this.goToPageActivation({data : {id : idUser}})
+    }
   }
   verifyEmail() {
     this.setState({ isEmailGood: isGoodEmail.test(this.state.email) }, () => {
