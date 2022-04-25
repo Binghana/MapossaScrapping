@@ -7,9 +7,7 @@ import {
     Pressable,
     ScrollView,
 } from "react-native";
-// import { createUsersCompteFinanciers } from "../../contollers/Functions/appManagement";
-// import { filter, requestPermissions } from "../../contollers/Functions/SMS";
-// import  SmsAndroid  from "react-native-get-sms-android-v2";
+
 import { logoOrange, logoMTN , logoMapossaScrapping} from "../../res/Images"
 
 

@@ -8,7 +8,7 @@ import PageRemerciement from './component/pageRemerciement';
 import PageInscription from './vues/pages/PageInscription';
 import ActivationScreen from './vues/pages/ActivationScreen';
 import RequestPermissionReadSMS from './vues/pages/RequestPermissionReadSMS';
-
+import AutorisationDenied from './vues/pages/AutorisationDenied';
 const Stack = createNativeStackNavigator();
 const App = () => {
 
@@ -20,7 +20,8 @@ const App = () => {
         }}
       >
         {/* <Stack.Screen name= "Inscription" component = {PageInscription} /> */}
-        <Stack.Screen name='RequestPermission' component={RequestPermissionReadSMS} />
+        {/* <Stack.Screen name='RequestPermission' component={RequestPermissionReadSMS} /> */}
+        <Stack.Screen name="AutorisationDenied"  component={AutorisationDenied} />
         <Stack.Screen name= "Inscription" component = {PageInscription} /> 
         <Stack.Screen name="Activation" component={ActivationScreen} />
         <Stack.Screen name="Acceuil"  component={Acceuil} />
