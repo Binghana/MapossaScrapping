@@ -14,7 +14,7 @@ import { urlConditionGeneralUtilisation, urlPolitiqueConfidentialite } from "../
 import { sendCreateUserRequest } from "../../contollers/APIRequest/User";
 import { getIdUser } from "../../contollers/Functions/appManagement";
 import { requestPermissions } from "../../contollers/Functions/SMS";
-import isGoodEmail from "../../contollers/RegExp";
+import { isGoodEmail } from "../../contollers/RegExp.js"
 import { openUrl, removeSpaceOfString } from "../../contollers/utilities";
 import storage from "../../storage";
 import { ERROR_CGU_NOT_ACCEPTED, ERROR_EMAIL_ALREADY_USE, ERROR_INVALID_EMAIL, ERROR_INVALID_PASSWORD, ERROR_NO_NETWORK, ERROR_UNKNOW_ERROR } from "../../contollers/ErrorMessages";
@@ -23,6 +23,7 @@ import { analytics } from "../../environment/config";
 
 const logiMapo = require("../../res/logo_mapossa_scrap.png");
 const loading = require("../../res/loader.gif");
+
 
 export default class PageInscription extends React.Component {
 
@@ -46,9 +47,9 @@ export default class PageInscription extends React.Component {
 
   }
   async componentDidMount() {
-    let idUser =  await getIdUser() ;
+    let idUser = await getIdUser();
     if (idUser) {
-      this.goToPageActivation({data : {id : idUser}})
+      this.goToPageActivation({ data: { id: idUser } })
     }
   }
   verifyEmail() {
@@ -89,13 +90,17 @@ export default class PageInscription extends React.Component {
       if (response.data.data.id) {
         console.log("sauvegardons l'id firebase de l'utilisateur")
         storage.set("idUser", response.data.data.id);
-        logEvent(analytics,"sign_up");
+        logEvent(analytics, "sign_up");
       }
       this.goToPageActivation(response.data);
 
     } catch (error) {
       console.warn("Une erreur est survennue")
-      this.setState({ isThereError: true, error: { body: JSON.stringify(error.response), title: "Une erreur est survennue" } }, () => { console.log(this.state) })
+      if (error.message && error.message == "Network Error") {
+        this.setState({ isThereError: true, error: { body: JSON.stringify(error), title: "Une erreur est survennue" } }, () => { console.log(this.state) })
+      } else {
+        this.setState({ isThereError: true, error: { body: JSON.stringify(error.response), title: "Une erreur est survennue" } }, () => { console.log(this.state) })
+      }
     }
     this.endAsyncOperation();
 
