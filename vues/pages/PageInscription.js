@@ -11,18 +11,21 @@ import {
   //ActivityIndicator
 } from "react-native";
 import { urlConditionGeneralUtilisation, urlPolitiqueConfidentialite } from "../../contollers/APIRequest/Const";
-import { sendCreateUserRequest } from "../../contollers/APIRequest/User";
+import { createAdaloUser, sendCreateUserRequest } from "../../contollers/APIRequest/User";
 import { getIdUser } from "../../contollers/Functions/appManagement";
-import { requestPermissions } from "../../contollers/Functions/SMS";
 import { isGoodEmail } from "../../contollers/RegExp.js"
 import { openUrl, removeSpaceOfString } from "../../contollers/utilities";
 import storage from "../../storage";
 import { ERROR_CGU_NOT_ACCEPTED, ERROR_EMAIL_ALREADY_USE, ERROR_INVALID_EMAIL, ERROR_INVALID_PASSWORD, ERROR_NO_NETWORK, ERROR_UNKNOW_ERROR } from "../../contollers/ErrorMessages";
 import { logEvent } from "firebase/analytics";
-import { analytics } from "../../environment/config";
+import { analytics, auth , db } from "../../environment/config";
+import { collection, setDoc , doc } from "firebase/firestore"; 
+
 
 const logiMapo = require("../../res/logo_mapossa_scrap.png");
 const loading = require("../../res/loader.gif");
+
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 
 export default class PageInscription extends React.Component {
@@ -83,27 +86,41 @@ export default class PageInscription extends React.Component {
 
     try {
       this.startAsyncOperation();
-      console.log("Envoyons la requête de création de compte utilisateur")
-      const response = await sendCreateUserRequest(this.state.email, this.state.password)
-      console.log("Voilà la réponse de la requête envoyé")
-      console.log(response.data)
-      if (response.data.data.id) {
-        console.log("sauvegardons l'id firebase de l'utilisateur")
-        storage.set("idUser", response.data.data.id);
-        logEvent(analytics, "sign_up");
-      }
-      this.goToPageActivation(response.data);
+      const userCredential = await createUserWithEmailAndPassword(auth, this.state.email, this.state.password);
+
+      console.log(userCredential);
+      const user = userCredential.user;
+      const res = await createAdaloUser(this.state.email , this.state.password , userCredential.user.uid, userCredential.user.getIdToken() );
+      console.log(JSON.stringify(res.data))
+      await this.createUserOnFirestore(user.uid,res.data.id)
+
+
 
     } catch (error) {
-      console.warn("Une erreur est survennue")
-      if (error.message && error.message == "Network Error") {
-        this.setState({ isThereError: true, error: { body: JSON.stringify(error), title: "Une erreur est survennue" } }, () => { console.log(this.state) })
-      } else {
-        this.setState({ isThereError: true, error: { body: JSON.stringify(error.response), title: "Une erreur est survennue" } }, () => { console.log(this.state) })
-      }
+      console.log(error)
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log(errorMessage)
+      // console.warn("Une erreur est survennue")
+      // if (error.message && error.message == "Network Error") {
+      //   this.setState({ isThereError: true, error: { body: JSON.stringify(error), title: "Une erreur est survennue" } }, () => { console.log(this.state) })
+      // } else {
+      //   this.setState({ isThereError: true, error: { body: JSON.stringify(error.response), title: "Une erreur est survennue" } }, () => { console.log(this.state) })
+      // }
     }
     this.endAsyncOperation();
 
+  }
+  async createUserOnFirestore (uid,idAdalo) {
+    try {
+      const docRef = await setDoc(doc(db,"users",uid), {
+          idAdalo : idAdalo,
+
+      });
+      console.log("Document written with ID: ", docRef.id);
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
   }
   startAsyncOperation() {
     console.log("Une operation asynchrone commence, montrons le loading")

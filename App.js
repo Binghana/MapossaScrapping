@@ -22,11 +22,11 @@ const App = () => {
           headerShown : false
         }}
       >
-        {/* <Stack.Screen name= "Inscription" component = {PageInscription} /> */}
+        <Stack.Screen name= "Inscription" component = {PageInscription} />
         {/* <Stack.Screen name='RequestPermission' component={RequestPermissionReadSMS} /> */}
         {/* <Stack.Screen name="AutorisationDenied"  component={AutorisationDenied} /> */}
         {/* <Stack.Screen name= "NoFinancialSMS" component = {NoFinancialSMS} />  */}
-        <Stack.Screen name='PreviewOfResult' component={PreviewOfResult} />
+        {/* <Stack.Screen name='PreviewOfResult' component={PreviewOfResult} /> */}
         {/* <Stack.Screen name ="AlertMoreThan2Number" component={AlertMoreThan2Number} /> */}
         {/* <Stack.Screen name="Activation" component={ActivationScreen} /> */}
         {/* <Stack.Screen name="Acceuil"  component={Acceuil} /> */}

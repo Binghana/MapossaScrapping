@@ -7,7 +7,8 @@ import {
     Pressable,
     ScrollView,
 } from "react-native";
-import { imgAlert , logoMessenger} from "../../res/Images"
+import { imgAlert , logoMessenger} from "../../res/Images";
+
 export default class AlertMoreThan2TwoNumber extends React.Component {
 
     render() {
