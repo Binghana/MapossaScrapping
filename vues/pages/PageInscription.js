@@ -18,14 +18,14 @@ import { openUrl, removeSpaceOfString } from "../../contollers/utilities";
 import storage from "../../storage";
 import { ERROR_CGU_NOT_ACCEPTED, ERROR_EMAIL_ALREADY_USE, ERROR_INVALID_EMAIL, ERROR_INVALID_PASSWORD, ERROR_NO_NETWORK, ERROR_UNKNOW_ERROR } from "../../contollers/ErrorMessages";
 import { logEvent } from "firebase/analytics";
-import { analytics, auth , db } from "../../environment/config";
-import { collection, setDoc , doc } from "firebase/firestore"; 
-
+import { auth , db } from "../../environment/config";
+import { setDoc , doc } from "firebase/firestore"; 
 
 const logiMapo = require("../../res/logo_mapossa_scrap.png");
 const loading = require("../../res/loader.gif");
 
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import { sdkAuthError } from "../../contollers/SDK-auth-error";
 
 
 export default class PageInscription extends React.Component {
@@ -43,8 +43,7 @@ export default class PageInscription extends React.Component {
       isLoading: false,
       isThereError: false,
       error: {
-        body: "",
-        title: "Une erreur es surennue"
+        
       }
     };
 
@@ -100,6 +99,7 @@ export default class PageInscription extends React.Component {
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log(errorMessage)
+      this.setState({isThereError : true , error : JSON.stringify(error)})
     }
     this.endAsyncOperation();
 
@@ -148,11 +148,19 @@ export default class PageInscription extends React.Component {
     this.props.navigation.navigate('Activation', { data: data });
   }
   showErrorInfo() {
-    const err = JSON.parse(this.state.error.body)
+    const err = JSON.parse(this.state.error)
     console.log("Le statut de l'erreur est")
     console.log(err.status)
-    console.log(err.data)
     console.log(err)
+    if ("code" in err) {
+      const errorcode = err.code;
+      if (errorcode == sdkAuthError.EMAIL_EXISTS) return ERROR_EMAIL_ALREADY_USE;
+
+      return err.code;
+
+    }
+    if (err.message && err.message == "Network Error") return ERROR_NO_NETWORK;
+
     if (err.status == 500) {
       if ("data" in err) {
         if (err.data.message == "Une érreur s'est produite") {
@@ -173,13 +181,7 @@ export default class PageInscription extends React.Component {
       }
     }
 
-    if ("message" in err) {
-      console.log(err.message)
-      if (err.message == ERROR_INVALID_EMAIL) return ERROR_INVALID_EMAIL;
-      if (err.message == ERROR_INVALID_PASSWORD) return ERROR_INVALID_PASSWORD;
-      if (err.message == ERROR_CGU_NOT_ACCEPTED) return ERROR_CGU_NOT_ACCEPTED;
-      if (err.message == "Network Error") return ERROR_NO_NETWORK;
-    }
+    
     return ERROR_UNKNOW_ERROR;
   }
   hideErrorInfo() {
