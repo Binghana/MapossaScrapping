@@ -90,9 +90,8 @@ export default class PageInscription extends React.Component {
 
       console.log(userCredential);
       const user = userCredential.user;
-      const res = await createAdaloUser(this.state.email , this.state.password , userCredential.user.uid, userCredential.user.getIdToken() );
-      console.log(JSON.stringify(res.data))
-      await this.createUserOnFirestore(user.uid,res.data.id)
+      //const res = await createAdaloUser(this.state.email , this.state.password , userCredential.user.uid, userCredential.user.getIdToken() );
+      await this.createUserOnFirestore(user.uid)
 
 
 
@@ -101,17 +100,11 @@ export default class PageInscription extends React.Component {
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log(errorMessage)
-      // console.warn("Une erreur est survennue")
-      // if (error.message && error.message == "Network Error") {
-      //   this.setState({ isThereError: true, error: { body: JSON.stringify(error), title: "Une erreur est survennue" } }, () => { console.log(this.state) })
-      // } else {
-      //   this.setState({ isThereError: true, error: { body: JSON.stringify(error.response), title: "Une erreur est survennue" } }, () => { console.log(this.state) })
-      // }
     }
     this.endAsyncOperation();
 
   }
-  async createUserOnFirestore (uid,idAdalo) {
+  async createUserOnFirestore (uid,idAdalo = 0) {
     try {
       const docRef = await setDoc(doc(db,"users",uid), {
           idAdalo : idAdalo,
@@ -228,7 +221,7 @@ export default class PageInscription extends React.Component {
         <View>
           <Text style={styles.label}>Password</Text>
           <View style={styles.espace2}></View>
-          <TextInput
+          <TextInput 
             placeholder="Insérez votre mot de passe..."
             placeholderTextColor="#000"
             onEndEditing={() => { this.verifyPassword() }}
