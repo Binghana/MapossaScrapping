@@ -11,21 +11,20 @@ import {
   //ActivityIndicator
 } from "react-native";
 import { urlConditionGeneralUtilisation, urlPolitiqueConfidentialite } from "../../contollers/APIRequest/Const";
-import { createAdaloUser, sendCreateUserRequest } from "../../contollers/APIRequest/User";
-import { getIdUser } from "../../contollers/Functions/appManagement";
+import {sendCreateUserRequest } from "../../contollers/APIRequest/User";
 import { isGoodEmail } from "../../contollers/RegExp.js"
 import { openUrl, removeSpaceOfString } from "../../contollers/utilities";
-import storage from "../../storage";
+
 import { ERROR_CGU_NOT_ACCEPTED, ERROR_EMAIL_ALREADY_USE, ERROR_INVALID_EMAIL, ERROR_INVALID_PASSWORD, ERROR_NO_NETWORK, ERROR_UNKNOW_ERROR } from "../../contollers/ErrorMessages";
-import { logEvent } from "firebase/analytics";
-import { auth , db } from "../../environment/config";
-import { setDoc , doc } from "firebase/firestore"; 
+
+import { auth } from "../../environment/config";
 
 const logiMapo = require("../../res/logo_mapossa_scrap.png");
 const loading = require("../../res/loader.gif");
 
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { browserLocalPersistence, createUserWithEmailAndPassword, setPersistence } from "firebase/auth";
 import { sdkAuthError } from "../../contollers/SDK-auth-error";
+import { requestPermissions } from "../../contollers/Functions/SMS";
 
 
 export default class PageInscription extends React.Component {
@@ -48,28 +47,32 @@ export default class PageInscription extends React.Component {
     };
 
   }
+
   async componentDidMount() {
-    let idUser = await getIdUser();
-    if (idUser) {
-      this.goToPageActivation({ data: { id: idUser } })
+    const user = auth.currentUser
+    console.log(user)
+    if (user) {
+      let permissionsGranted = await requestPermissions()
+      if (permissionsGranted) this.goToPageActivation();
+      else this.goToPageAccessDenied();
     }
   }
+
   verifyEmail() {
     this.setState({ isEmailGood: isGoodEmail.test(this.state.email) }, () => {
       if (!this.state.isEmailGood) this.setState({
-        isThereError: true, error: {
-          body: JSON.stringify({ message: ERROR_INVALID_EMAIL })
-        }
+        isThereError: true, error: JSON.stringify({ message: ERROR_INVALID_EMAIL })
+        
       })
       this.enableButton();
     })
   }
+
   verifyPassword() {
     this.setState({ isPassWordGood: this.state.password.length > 7 }, () => {
       if (!this.state.isPassWordGood) this.setState({
-        isThereError: true, error: {
-          body: JSON.stringify({ message: ERROR_INVALID_PASSWORD })
-        }
+        isThereError: true, error: JSON.stringify({ message: ERROR_INVALID_PASSWORD })
+        
       })
       this.enableButton()
     })
@@ -81,36 +84,45 @@ export default class PageInscription extends React.Component {
 
     this.setState({ isButtonDisabled: !res });
   }
+
   async createUser() {
 
     try {
       this.startAsyncOperation();
+      //await setPersistence(auth,browserLocalPersistence)
       const userCredential = await createUserWithEmailAndPassword(auth, this.state.email, this.state.password);
 
       console.log(userCredential);
       const user = userCredential.user;
       //const res = await createAdaloUser(this.state.email , this.state.password , userCredential.user.uid, userCredential.user.getIdToken() );
       await this.createUserOnFirestore(user.uid)
-
+      this.goToPageActivation()
+      this.endAsyncOperation()
 
 
     } catch (error) {
+      
       console.log(error)
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log(errorMessage)
       this.setState({isThereError : true , error : JSON.stringify(error)})
+      this.endAsyncOperation()
     }
+    
     this.endAsyncOperation();
-
   }
+
   async createUserOnFirestore (uid,idAdalo = 0) {
     try {
-      const docRef = await setDoc(doc(db,"users",uid), {
-          idAdalo : idAdalo,
-
-      });
-      console.log("Document written with ID: ", docRef.id);
+      // console.log(uid)
+      // console.log("mettons les données sur firestore")
+      // collection(db , "users")
+      // const docRef = await setDoc( doc(db,"users",uid), {
+      //     idAdalo : idAdalo,
+      // });
+      const res = await sendCreateUserRequest(uid);
+      console.log("Document written with ID: ", res.data);
     } catch (e) {
       console.error("Error adding document: ", e);
     }
@@ -133,9 +145,7 @@ export default class PageInscription extends React.Component {
       this.setState({ isTermsOfuseAndPrivacyPolicyAccepted: false }, () => {
 
         this.setState({
-          isThereError: true, error: {
-            body: JSON.stringify({ message: ERROR_CGU_NOT_ACCEPTED })
-          }
+          isThereError: true, error:JSON.stringify({ message: ERROR_CGU_NOT_ACCEPTED })
         })
 
         console.log("metton à jour le bouton")
@@ -143,9 +153,13 @@ export default class PageInscription extends React.Component {
       })
     }
   }
-  goToPageActivation(data) {
-    console.log("Allons sur la page activtion")
-    this.props.navigation.navigate('Activation', { data: data });
+  goToPageActivation() {
+    console.log("Allons sur la page de demande d'autorisation")
+    this.props.navigation.navigate('PluginInstalledSuccessfully');
+  }
+  goToPageAccessDenied() {
+    console.log("Allons sur la page de demande d'autorisation")
+    this.props.navigation.navigate('AutorisationDenied');
   }
   showErrorInfo() {
     const err = JSON.parse(this.state.error)

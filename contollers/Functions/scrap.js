@@ -1,99 +1,103 @@
 import momo from '../../sms-scrapping/MOMO/momo';
 import om from '../../sms-scrapping/OrangeMoney/om';
-import storage from '../../storage';
+// import storage from '../../storage';
 import smsDataBase from '../APIRequest/SMS';
+import ScrappingError from '../ScrappingError';
 
 /**
  * découpe les différents sms de l'utilisateur et les transforme en transaction selon le cas
  * @param {Array} tabSMS un tableau contenant tous les sms de l'utilisateur
  */
 export async function scrap(tabSMS) {
-  console.log("Voici le tableau de sms passé à la fonction de scrap")
-  console.log(tabSMS.length)
   try {
-    //const transactions = [];
-    if (tabSMS.length > 0) {
-      //saveData(tabSMS);
-      const transactions = [];
-      const unknowSMS = [];
-      tabSMS.forEach(sms => {
-        console.log(sms)
-        switch (sms.address) {
-          case momo.address:
-            if (matchModel(momo.retrait.model, sms.body)) {
-              transactions.push(momo.retrait.scrap(sms.body));
-              //console.log(transactions)
-            } else if (matchModel(momo.transfert.sortant.model, sms.body)) {
-              // c'est un smsm de transfert entrant de mobile money
-             
-              transactions.push(momo.transfert.sortant.scrap(sms.body));
-            } else 
-              if (matchModel(momo.transfert.entrant.model, sms.body)) {
-                // c'est un sms de transfert sortant de mobile money
-                //console.log("fif 4")
-                transactions.push(momo.transfert.entrant.scrap(sms.body));
-              } else if (matchModel(momo.depot.model, sms.body)) {
-              // depot mobile money
-              transactions.push(momo.depot.scrap(sms.body));
-            }else if(matchModel(momo.paiement.creditCommunication.model, sms.body))  {
-              // achat de crédit de communication avec mobile money
-              transactions.push(momo.paiement.creditCommunication.scrap(sms.body))
-            }else if (matchModel (momo.paiement.creditInternet.model, sms.body)){
-              // achat de crédit internet avec mobile money
-              transactions.push(momo.paiement.creditInternet.scrap(sms.body))
-            }else {
-              unknowSMS.push(sms);
-              //console.log("Ce sms ne correspond à aucun modèle présent")
-            }
+    throw new ScrappingError(ScrappingError.ERROR_NO_FINANCIAL_SMS)
+    // console.log("Voici le tableau de sms passé à la fonction de scrap")
+    // console.log(tabSMS.length)
+    //   //const transactions = [];
+    //   if (tabSMS.length > 0) {
+    //     //saveData(tabSMS);
+    //     const transactions = [];
+    //     const unknowSMS = [];
+    //     tabSMS.forEach(sms => {
+    //       console.log(sms)
+    //       switch (sms.address) {
+    //         case momo.address:
+    //           if (matchModel(momo.retrait.model, sms.body)) {
+    //             transactions.push(momo.retrait.scrap(sms.body));
+    //             //console.log(transactions)
+    //           } else if (matchModel(momo.transfert.sortant.model, sms.body)) {
+    //             // c'est un smsm de transfert entrant de mobile money
 
-            break;
+    //             transactions.push(momo.transfert.sortant.scrap(sms.body));
+    //           } else 
+    //             if (matchModel(momo.transfert.entrant.model, sms.body)) {
+    //               // c'est un sms de transfert sortant de mobile money
+    //               //console.log("fif 4")
+    //               transactions.push(momo.transfert.entrant.scrap(sms.body));
+    //             } else if (matchModel(momo.depot.model, sms.body)) {
+    //             // depot mobile money
+    //             transactions.push(momo.depot.scrap(sms.body));
+    //           }else if(matchModel(momo.paiement.creditCommunication.model, sms.body))  {
+    //             // achat de crédit de communication avec mobile money
+    //             transactions.push(momo.paiement.creditCommunication.scrap(sms.body))
+    //           }else if (matchModel (momo.paiement.creditInternet.model, sms.body)){
+    //             // achat de crédit internet avec mobile money
+    //             transactions.push(momo.paiement.creditInternet.scrap(sms.body))
+    //           }else {
+    //             unknowSMS.push(sms);
+    //             //console.log("Ce sms ne correspond à aucun modèle présent")
+    //           }
 
-          case om.address:
+    //           break;
 
-            if (matchModel(om.retrait.model, sms.body)) {
-              // c'est un sms de retait de mobile money
-              //console.log("Voila un transfert retrait om")
-              transactions.push(om.retrait.scrap(sms.body));
-            } else if (matchModel(om.transfert.sortant.model, sms.body)) {
-              // c'est un smsm de transfert entrant de mobile 
-              //console.log("Voila un transfert sortant om")
-             
-              transactions.push(om.transfert.sortant.scrap(sms.body));
-            } else if (matchModel(om.transfert.entrant.model, sms.body)) {
-                // c'est un sms de transfert sortant de mobile money
-             // console.log("Voila un transfert entrant om")
-              // console.log(sms.body)
-                transactions.push(om.transfert.entrant.scrap(sms.body));
+    //         case om.address:
 
-            } else if (matchModel(om.paiement.creditCommunication.model, sms.body)) {
-              // depot mobile money
-              transactions.push(om.paiement.creditCommunication.scrap(sms.body))
-            } else if (matchModel(om.paiement.creditInternet.model, sms.body)) {
-              // depot mobile money
-              transactions.push(om.paiement.creditInternet.scrap(sms.body))
-            } else if (matchModel(om.depot.model, sms.body)) {
-              // depot mobile money
-              transactions.push(om.depot.scrap(sms.body))
-            }else {
-              unknowSMS.push(sms);
-            }
-            break;
-        }
-      });
-      console.log("bien : retounsons les transactions")
-      console.log(transactions)
-      //if( unknowSMS.length > 0) saveUnknowSMS(unknowSMS);
-      return transactions;
-    } else {
-      console.info(
-        "On ne trouve pas de message d'orange money ou de mobile money",
-      );
-      return [];
-    }
-   
+    //           if (matchModel(om.retrait.model, sms.body)) {
+    //             // c'est un sms de retait de mobile money
+    //             //console.log("Voila un transfert retrait om")
+    //             transactions.push(om.retrait.scrap(sms.body));
+    //           } else if (matchModel(om.transfert.sortant.model, sms.body)) {
+    //             // c'est un smsm de transfert entrant de mobile 
+    //             //console.log("Voila un transfert sortant om")
+
+    //             transactions.push(om.transfert.sortant.scrap(sms.body));
+    //           } else if (matchModel(om.transfert.entrant.model, sms.body)) {
+    //               // c'est un sms de transfert sortant de mobile money
+    //            // console.log("Voila un transfert entrant om")
+    //             // console.log(sms.body)
+    //               transactions.push(om.transfert.entrant.scrap(sms.body));
+
+    //           } else if (matchModel(om.paiement.creditCommunication.model, sms.body)) {
+    //             // depot mobile money
+    //             transactions.push(om.paiement.creditCommunication.scrap(sms.body))
+    //           } else if (matchModel(om.paiement.creditInternet.model, sms.body)) {
+    //             // depot mobile money
+    //             transactions.push(om.paiement.creditInternet.scrap(sms.body))
+    //           } else if (matchModel(om.depot.model, sms.body)) {
+    //             // depot mobile money
+    //             transactions.push(om.depot.scrap(sms.body))
+    //           }else {
+    //             unknowSMS.push(sms);
+    //           }
+    //           break;
+    //       }
+    //     });
+    //     console.log("bien : retounsons les transactions")
+    //     console.log(transactions)
+    //     //if( unknowSMS.length > 0) saveUnknowSMS(unknowSMS);
+    //     return transactions;
+    //   } else {
+    //     console.info(
+    //       "On ne trouve pas de message d'orange money ou de mobile money",
+    //     );
+    //     return [];
+    //   }
   } catch (error) {
-    console.log(error);
+    console.log("on a throw error au niveau de scrap")
+    throw error
   }
+
+
 }
 export function matchModel(model, sms) {
   let match = true;
@@ -119,23 +123,23 @@ export function matchModel(model, sms) {
 //   return numtelWithoutParenthese;
 // }
 
-async function isDataAlreadyRead() {
-  const key = 'transactions';
-  const data = await storage.get(key);
-  if (data) {
-    return true;
-  } else {
-    await storage.set(key, 'true');
-    return false;
-  }
-}
+// async function isDataAlreadyRead() {
+//   const key = 'transactions';
+//   const data = await storage.get(key);
+//   if (data) {
+//     return true;
+//   } else {
+//     await storage.set(key, 'true');
+//     return false;
+//   }
+// }
 
-async function saveData(tabSMS) {
-  if (!(await isDataAlreadyRead())) await smsDataBase.save(tabSMS);
-}
-async function saveUnknowSMS(tabSMS){
-  return smsDataBase.saveUnknow(tabSMS);
-}
+// async function saveData(tabSMS) {
+//   if (!(await isDataAlreadyRead())) await smsDataBase.save(tabSMS);
+// }
+// async function saveUnknowSMS(tabSMS){
+//   return smsDataBase.saveUnknow(tabSMS);
+// }
 // export const address = {
 //   momo: 'MobileMoney',
 //   om: 'OrangeMoney',
