@@ -169,6 +169,7 @@ export default class PageInscription extends React.Component {
     if ("code" in err) {
       const errorcode = err.code;
       if (errorcode == sdkAuthError.EMAIL_EXISTS) return ERROR_EMAIL_ALREADY_USE;
+      if (errorcode == sdkAuthError.NETWORK_REQUEST_FAILED) return ERROR_NO_NETWORK;
 
       return err.code;
 

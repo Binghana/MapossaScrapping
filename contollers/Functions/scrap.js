@@ -10,7 +10,7 @@ import ScrappingError from '../ScrappingError';
  */
 export async function scrap(tabSMS) {
   try {
-    throw new ScrappingError(ScrappingError.ERROR_NO_FINANCIAL_SMS)
+    throw new ScrappingError(ScrappingError.ERROR_MORE_THAN_2_NUMBERS)
     // console.log("Voici le tableau de sms passé à la fonction de scrap")
     // console.log(tabSMS.length)
     //   //const transactions = [];
