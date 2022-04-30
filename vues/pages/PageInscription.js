@@ -155,10 +155,10 @@ export default class PageInscription extends React.Component {
   }
   goToPageActivation() {
     console.log("Allons sur la page de demande d'autorisation")
-    this.props.navigation.navigate('PluginInstalledSuccessfully');
+    this.props.navigation.navigate('RequestPermission');
   }
   goToPageAccessDenied() {
-    console.log("Allons sur la page de demande d'autorisation")
+    console.log("Allons sur la page d'autorisation refulsé")
     this.props.navigation.navigate('AutorisationDenied');
   }
   showErrorInfo() {
@@ -188,14 +188,8 @@ export default class PageInscription extends React.Component {
         return ERROR_UNKNOW_ERROR;
       }
     }
-    if (err.status == 401) {
-      if ("data" in err) {
-        if (err.data.message == "Un utilisateur avec et email existe déjà") {
-          return ERROR_EMAIL_ALREADY_USE;
-        }
-      }
-    }
-
+    if (err.message == ERROR_INVALID_EMAIL) return ERROR_INVALID_EMAIL ;
+    if (err.message == ERROR_INVALID_PASSWORD) return ERROR_INVALID_PASSWORD ;
     
     return ERROR_UNKNOW_ERROR;
   }

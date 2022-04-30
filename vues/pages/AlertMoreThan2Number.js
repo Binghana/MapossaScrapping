@@ -20,8 +20,8 @@ export default class AlertMoreThan2TwoNumber extends React.Component {
                     <Image style={styles.appLogo} source={imgAlert} />
 
                     <Text style={styles.title} >Alerte !</Text>
-                    <Text style={styles.content} >Nous avons trouvé plus de 02 numero de telephone pour le même opérateur sur votre teléphone. </Text>
-                        <Text style={styles.content} >Contactez nous pour nous spécifier le numero que vous souhaitez utiliser dans Mapossa </Text>
+                    <Text style={styles.content} >Nous avons trouvé plus de 02 numéros de téléphone pour le même opérateur sur votre téléphone.</Text>
+                        <Text style={styles.content} >Contactez-nous pour nous spécifier le numéro que vous souhaitez utiliser avec Mapossa</Text>
                     <Pressable style={styles.button} >
                         <Image style = {styles.logoMessenger} source = {logoMessenger}/>
                         <Text style={styles.buttonText}>Envoyer un message</Text>

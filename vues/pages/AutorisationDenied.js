@@ -9,7 +9,13 @@ import {
 } from "react-native";
 import { imgSorry } from "../../res/Images"
 export default class AutorisationDenied extends React.Component {
-
+    constructor(props){
+        super(props)
+    }
+    goToPage(pageName) {
+        console.log("Allons sur la page " + pageName)
+        this.props.navigation.navigate(pageName);
+    }
     render() {
         return (
             <ScrollView style={styles.main}>
@@ -22,7 +28,7 @@ export default class AutorisationDenied extends React.Component {
                     <Text style={styles.content} >Sans l’accès à vos SMS, nous ne vous serons d’aucune utilité.
                         A bientot</Text>
 
-                    <Pressable style={styles.button} >
+                    <Pressable style={styles.button} onPress = {this.goToPage("RequestPermission")} >
                         <Text style={styles.buttonText}>J'ai Comrpis</Text>
                     </Pressable>
 
@@ -74,7 +80,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         height: 48,
         borderRadius: 8,
-        backgroundColor: "#E9E9E9"
+        backgroundColor: "#FFCC00"
     },
     buttonText: {
         fontSize: 16,

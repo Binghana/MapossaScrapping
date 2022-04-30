@@ -16,7 +16,7 @@ import { logoOrange, logoMTN, logoMapossaScrapping } from "../../res/Images"
 export default class RequestPermissionReadSMS extends React.Component {
     async requestPermissions() {
         const permissionsGranted = await requestPermissions();
-        if (permissionsGranted) this.goToPage("PreviewOfResult");
+        if (permissionsGranted) this.goToPage("PluginInstalledSuccessfully");
         else this.goToPage("AutorisationDenied");
     }
 
