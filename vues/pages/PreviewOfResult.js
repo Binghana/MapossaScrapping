@@ -77,9 +77,7 @@ export default class PreviewOfResult extends React.Component {
                                             <Text style={styles.textMontant}> {this.state.orange.sommeSortie} FCFA</Text>
                                         </View>
                                     </View>
-                                    <View>
-                                        <Text>Sortant</Text>
-                                    </View>
+                                    
                                 </View>
                             </View>
                         </View>
@@ -109,9 +107,7 @@ export default class PreviewOfResult extends React.Component {
                                             <Text style={styles.textMontant}> {this.state.mtn.sommeSortie} FCFA</Text>
                                         </View>
                                     </View>
-                                    <View>
-                                        <Text>Sortant</Text>
-                                    </View>
+                                   
                                 </View>
                             </View>
                         </View>
@@ -154,7 +150,7 @@ const styles = StyleSheet.create({
         color: "black",
         fontSize: 13,
         marginStart: 7,
-        marginEnd: 3
+        marginEnd: 1
     },
     textTypeFinal: {
         color: "grey",

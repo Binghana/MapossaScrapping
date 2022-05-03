@@ -1,10 +1,12 @@
 
+import { auth } from '../../environment/config';
 import momo from '../../sms-scrapping/MOMO/momo';
 import om from '../../sms-scrapping/OrangeMoney/om';
 //import storage from '../../storage';
 import { sendCreateCompteFinancier } from '../APIRequest/CompteFinanciers';
+import ScrappingError from '../ScrappingError';
 import { scrap } from './scrap';
-import { getAllTransactionsOfOperator, getFrequentNumberOfOperator } from './scrapingOperation';
+import { getAllTransactionsOfOperator, getFrequentNumberOfOperator, getOperatorNumbers } from './scrapingOperation';
 //import { getAllSMS } from './SMS';
 
 
@@ -16,50 +18,54 @@ import { getAllTransactionsOfOperator, getFrequentNumberOfOperator } from './scr
 //     return await storage.set("idUser", idUser);
 // }
 
-export async function createUsersCompteFinanciers(tabSMS) {
+export async function createUsersCompteFinanciers(data) {
 
     try {
         console.log("On a récupérer les sms de l'utilisateur")
         // console.log ( tabSMS.length);
-        // console.log("Scrappons les sms")
-        const tabTransaction = await scrap(tabSMS);
-        // console.log("on a pu scrapper les sms ");
-        // console.log( tabTransaction);
+        console.log("Scrappons les sms")
+        
+        
+        if ( ! data.isThereData) throw new ScrappingError(ScrappingError.ERROR_NO_FINANCIAL_SMS);
+        console.log("on a des données")
+        console.log (data.transactions)
+        console.log("Récuperons le numéros mtn");
 
-        // const transactionsOrange = getAllTransactionsOfOperator(tabTransaction , om.address);
-        // console.log( "Ok voici les transactions orange")
-        // console.log(transactionsOrange);
-        // const transactionsMTN = getAllTransactionsOfOperator(tabTransaction , momo.address)
-        // console.log( "Ok voici les transactions MTN")
-        // console.log(transactionsMTN);
-        // console.log("Regardons les numéros les plus utilisés");
-        // const mostFrequentOrangeNumber = getFrequentNumberOfOperator(transactionsOrange);
-        // console.log("Le numéro orange le plus utilisés est : ")
-        // console.log(mostFrequentOrangeNumber);
+        const numeroMTN = getOperatorNumbers( data.transactions.momo.transfertSortant );
+        console.log("Récupérons le numéro ornage")
+        console.log(data.transactions.om.transfertSortant)
+        const numeroOrange = getOperatorNumbers( data.transactions.om.transfertSortant);
+        console.log(numeroMTN); console.log(numeroOrange);
+        if (numeroMTN.length >1 || numeroOrange.length > 1) throw new ScrappingError(ScrappingError.ERROR_MORE_THAN_2_NUMBERS);
 
 
-        // const mostFrequentMTNNumber = getFrequentNumberOfOperator(transactionsMTN);
-        // console.log("Le numéro MTN le plus utilisés est : ");
-        // console.log(mostFrequentMTNNumber);
-
-        // try {
-        //     if (mostFrequentMTNNumber) {
-        //         console.log("Envoyons la requête de création du compte financier MTN ");
-        //         await sendCreateCompteFinancier(momo.address, mostFrequentMTNNumber);
-        //     }
-        //     if (mostFrequentOrangeNumber) {
-        //         console.log("Envoyons la requête de création du compte financier Orange ");
-        //         await sendCreateCompteFinancier ( om.address , mostFrequentOrangeNumber);
-        //     }
-        // } catch (error) {
-        //     console.log(error)
-        //     throw error
-        // }    
+        try {
+            if (numeroMTN.length>0) {
+                console.log("Envoyons la requête de création du compte financier MTN ");
+                await sendCreateCompteFinancier(momo.address, numeroMTN[0].numero);
+            }
+            if (numeroOrange.length>0) {
+                console.log("Envoyons la requête de création du compte financier Orange ");
+                await sendCreateCompteFinancier ( om.address , numeroOrange[0].numero);
+            }
+        } catch (error) {
+            console.log(error)
+            throw error
+        }    
         console.log("on a créer les comptes financiers avec succès")
     } catch (error) {
-        console.log("on a theow l'erreur au niveau de appmanagement")
+        console.log("on a throw l'erreur au niveau de appManagement")
+        console.log(error)
         throw error;
     }
 
 
+}
+
+export function createAutoTransaction(data) {
+    
+    
+}
+export function getIdUser() {
+    return auth.currentUser.uid;
 }

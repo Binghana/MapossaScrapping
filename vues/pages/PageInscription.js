@@ -11,13 +11,13 @@ import {
   //ActivityIndicator
 } from "react-native";
 import { urlConditionGeneralUtilisation, urlPolitiqueConfidentialite } from "../../contollers/APIRequest/Const";
-import {sendCreateUserRequest } from "../../contollers/APIRequest/User";
+import { sendCreateUserRequest } from "../../contollers/APIRequest/User";
 import { isGoodEmail } from "../../contollers/RegExp.js"
 import { openUrl, removeSpaceOfString } from "../../contollers/utilities";
 
 import { ERROR_CGU_NOT_ACCEPTED, ERROR_EMAIL_ALREADY_USE, ERROR_INVALID_EMAIL, ERROR_INVALID_PASSWORD, ERROR_NO_NETWORK, ERROR_UNKNOW_ERROR } from "../../contollers/ErrorMessages";
 
-import { auth } from "../../environment/config";
+import { auth, isTest } from "../../environment/config";
 
 const logiMapo = require("../../res/logo_mapossa_scrap.png");
 const loading = require("../../res/loader.gif");
@@ -42,13 +42,14 @@ export default class PageInscription extends React.Component {
       isLoading: false,
       isThereError: false,
       error: {
-        
+
       }
     };
 
   }
 
   async componentDidMount() {
+
     const user = auth.currentUser
     console.log(user)
     if (user) {
@@ -56,13 +57,14 @@ export default class PageInscription extends React.Component {
       if (permissionsGranted) this.goToPageActivation();
       else this.goToPageAccessDenied();
     }
+
   }
 
   verifyEmail() {
     this.setState({ isEmailGood: isGoodEmail.test(this.state.email) }, () => {
       if (!this.state.isEmailGood) this.setState({
         isThereError: true, error: JSON.stringify({ message: ERROR_INVALID_EMAIL })
-        
+
       })
       this.enableButton();
     })
@@ -72,7 +74,7 @@ export default class PageInscription extends React.Component {
     this.setState({ isPassWordGood: this.state.password.length > 7 }, () => {
       if (!this.state.isPassWordGood) this.setState({
         isThereError: true, error: JSON.stringify({ message: ERROR_INVALID_PASSWORD })
-        
+
       })
       this.enableButton()
     })
@@ -101,19 +103,19 @@ export default class PageInscription extends React.Component {
 
 
     } catch (error) {
-      
+
       console.log(error)
       const errorCode = error.code;
       const errorMessage = error.message;
       console.log(errorMessage)
-      this.setState({isThereError : true , error : JSON.stringify(error)})
+      this.setState({ isThereError: true, error: JSON.stringify(error) })
       this.endAsyncOperation()
     }
-    
+
     this.endAsyncOperation();
   }
 
-  async createUserOnFirestore (uid,idAdalo = 0) {
+  async createUserOnFirestore(uid, idAdalo = 0) {
     try {
       // console.log(uid)
       // console.log("mettons les données sur firestore")
@@ -145,7 +147,7 @@ export default class PageInscription extends React.Component {
       this.setState({ isTermsOfuseAndPrivacyPolicyAccepted: false }, () => {
 
         this.setState({
-          isThereError: true, error:JSON.stringify({ message: ERROR_CGU_NOT_ACCEPTED })
+          isThereError: true, error: JSON.stringify({ message: ERROR_CGU_NOT_ACCEPTED })
         })
 
         console.log("metton à jour le bouton")
@@ -188,9 +190,9 @@ export default class PageInscription extends React.Component {
         return ERROR_UNKNOW_ERROR;
       }
     }
-    if (err.message == ERROR_INVALID_EMAIL) return ERROR_INVALID_EMAIL ;
-    if (err.message == ERROR_INVALID_PASSWORD) return ERROR_INVALID_PASSWORD ;
-    
+    if (err.message == ERROR_INVALID_EMAIL) return ERROR_INVALID_EMAIL;
+    if (err.message == ERROR_INVALID_PASSWORD) return ERROR_INVALID_PASSWORD;
+
     return ERROR_UNKNOW_ERROR;
   }
   hideErrorInfo() {
@@ -205,7 +207,11 @@ export default class PageInscription extends React.Component {
 
         <View style={styles.espace1}></View>
         <View >
-          <Image source={logiMapo} style={styles.image} />
+          <Pressable onLongPress={() => { this.goToPageActivation() }}  >
+            <Image source={logiMapo} style={styles.image} />
+
+          </Pressable>
+
         </View>
         <View style={styles.espace1}></View>
         <View>
@@ -232,7 +238,7 @@ export default class PageInscription extends React.Component {
         <View>
           <Text style={styles.label}>Password</Text>
           <View style={styles.espace2}></View>
-          <TextInput 
+          <TextInput
             placeholder="Insérez votre mot de passe..."
             placeholderTextColor="#000"
             onEndEditing={() => { this.verifyPassword() }}

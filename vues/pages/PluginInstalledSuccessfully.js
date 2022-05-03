@@ -12,6 +12,7 @@ import SmsAndroid from "react-native-get-sms-android-v2";
 import { createUsersCompteFinanciers } from "../../contollers/Functions/appManagement";
 import { requestPermissions, filter } from "../../contollers/Functions/SMS";
 import ScrappingError from "../../contollers/ScrappingError";
+import { scrap } from "../../contollers/Functions/scrap";
 export default class PluginInstalledSuccessfully extends React.Component {
     constructor(props) {
         super(props)
@@ -31,13 +32,14 @@ export default class PluginInstalledSuccessfully extends React.Component {
                         try {
                             const tabSMS = JSON.parse(smsList)
                             console.log("on a récupéré" + tabSMS.count)
-
-                            await createUsersCompteFinanciers(tabSMS)
+                            const data = await scrap(tabSMS);
+                            await createUsersCompteFinanciers(data);
+                            
                             const OMEInfo = this.getOMEfinancialInformations(tabSMS);
                             this.gotToPage("PreviewOfResult", OMEInfo);
                         } catch (error) {
                             console.log("on a throw l'erruer au niveau de puliffin succ ")
-                            console.log(error.code);
+                            console.log(error);
                             if (error instanceof ScrappingError) {
                                 if (error.code == ScrappingError.ERROR_MORE_THAN_2_NUMBERS) return this.gotToPage("AlertMoreThan2Number");
                                 if (error.code == ScrappingError.ERROR_NO_FINANCIAL_SMS ) return this.gotToPage("NoFinancialSMS");

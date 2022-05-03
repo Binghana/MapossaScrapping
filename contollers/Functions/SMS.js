@@ -1,5 +1,5 @@
 import { PermissionsAndroid } from "react-native";
-
+export let nbJoursEnArrire = 90;
 
 export const filter = {
   //box: 'inbox', // 'inbox' (default), 'sent', 'draft', 'outbox', 'failed', 'queued', and '' for all
@@ -13,7 +13,7 @@ export const filter = {
    *    - Same for minDate but with "date >= minDate"
    */
   
-  minDate: (new Date().getTime() -90*24*3600*1000), // timestamp (in milliseconds since UNIX epoch)
+  minDate: (new Date().getTime() -nbJoursEnArrire*24*3600*1000), // timestamp (in milliseconds since UNIX epoch)
   maxDate: new Date().getTime(), // timestamp (in milliseconds since UNIX epoch)
   /*bodyRegex: '(.*)How are you(.*)', // content regex to match
   */

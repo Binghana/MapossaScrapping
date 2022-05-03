@@ -70,7 +70,8 @@ export function initTransaction(typeInitial = "Retrait", flux = "", operateur = 
     numEmetteur: undefined,
     numRecepteur: undefined,
     flux: flux,
-    typeSecondaire: undefined
+    typeSecondaire: undefined,
+    isAuto : true
   };
 }
 export function decoupeSMS(
