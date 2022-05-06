@@ -9,10 +9,13 @@ import {
 } from "react-native";
 import { imgWorkingAPI } from "../../res/Images"
 import SmsAndroid from "react-native-get-sms-android-v2";
-import { createUsersCompteFinanciers } from "../../contollers/Functions/appManagement";
+import { createAutoTransaction, createUsersCompteFinanciers } from "../../contollers/Functions/appManagement";
 import { requestPermissions, filter } from "../../contollers/Functions/SMS";
 import ScrappingError from "../../contollers/ScrappingError";
 import { scrap } from "../../contollers/Functions/scrap";
+import { getUserAllCompteFinanciers } from "../../contollers/APIRequest/CompteFinanciers";
+import om from "../../sms-scrapping/OrangeMoney/om";
+import momo from "../../sms-scrapping/MOMO/momo";
 export default class PluginInstalledSuccessfully extends React.Component {
     constructor(props) {
         super(props)
@@ -34,15 +37,16 @@ export default class PluginInstalledSuccessfully extends React.Component {
                             console.log("on a récupéré" + tabSMS.count)
                             const data = await scrap(tabSMS);
                             await createUsersCompteFinanciers(data);
-                            
-                            const OMEInfo = this.getOMEfinancialInformations(tabSMS);
+                            await createAutoTransaction(data);
+                            const OMEInfo = await this.getOMEfinancialInformations();
                             this.gotToPage("PreviewOfResult", OMEInfo);
                         } catch (error) {
                             console.log("on a throw l'erruer au niveau de puliffin succ ")
                             console.log(error);
+                            if (error.message == "Network Error") console.log("erreur pas de connection")
                             if (error instanceof ScrappingError) {
                                 if (error.code == ScrappingError.ERROR_MORE_THAN_2_NUMBERS) return this.gotToPage("AlertMoreThan2Number");
-                                if (error.code == ScrappingError.ERROR_NO_FINANCIAL_SMS ) return this.gotToPage("NoFinancialSMS");
+                                if (error.code == ScrappingError.ERROR_NO_FINANCIAL_SMS) return this.gotToPage("NoFinancialSMS");
                             }
                         }
 
@@ -56,17 +60,32 @@ export default class PluginInstalledSuccessfully extends React.Component {
 
         }
     }
-    getOMEfinancialInformations(tabSMS = []) {
-        console.log("on a bien récupéreé les informations des OME");
-        const OMEInfo = {
-            orangeNumber: "699903307",
-            orangeSommeEntree: 152000,
-            orangeSommeSortie: 25000,
-            mtnNumber: "678529685",
-            mtnSommeEntree: 35800,
-            mtnSommeSortie: 15500
+    async getOMEfinancialInformations() {
+
+        const res = await getUserAllCompteFinanciers();
+        if (res.data.data) {
+            /**
+             * @type {Array}
+             */
+            const comptes = res.data.data;
+            const compteOrange = comptes.find (c => c.nomOperateur == om.address);
+            const compteMTN = comptes.find (c => c.nomOperateur == momo.address);
+            console.log(compteOrange);
+            console.log(compteMTN)
+            console.log("on a bien récupéreé les informations des OME");
+
+            const OMEInfo = {
+                orangeNumber: (compteOrange)? compteOrange.numero : "-",
+                orangeSommeEntree:  (compteOrange)? compteOrange.sommeEntree : 0,
+                orangeSommeSortie:  (compteOrange)? compteOrange.sommeSortie : 0,
+                mtnNumber:  (compteMTN)? compteMTN.numero : "-",
+                mtnSommeEntree: (compteMTN)? compteMTN.sommeEntree : 0,
+                mtnSommeSortie: (compteMTN)? compteMTN.sommeSortie : 0,
+            }
+            return OMEInfo;
         }
-        return OMEInfo;
+
+
     }
     gotToPage(pageName, data = {}) {
         console.log("Allons sur la page " + pageName)

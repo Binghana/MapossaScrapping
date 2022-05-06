@@ -11,6 +11,8 @@ import NoFinancialSMS from './vues/pages/NoFinancialSMS';
 import AlertMoreThan2Number from './vues/pages/AlertMoreThan2Number';
 import PreviewOfResult from './vues/pages/PreviewOfResult';
 import PluginInstalledSuccessfully from './vues/pages/PluginInstalledSuccessfully';
+import ShouldVerifyEmail from './vues/pages/ShouldVerifyEmail';
+import RequestUpdateAPP from './vues/pages/RequestUpdateAPP';
 
 const Stack = createNativeStackNavigator();
 const App = () => {
@@ -23,12 +25,14 @@ const App = () => {
         }}
       >
         <Stack.Screen name= "Inscription" component = {PageInscription} />
+        <Stack.Screen name='ShouldVerifyEmail' component={ShouldVerifyEmail} />
         <Stack.Screen name='RequestPermission' component={RequestPermissionReadSMS} />
         <Stack.Screen name="AutorisationDenied"  component={AutorisationDenied} />
         <Stack.Screen name='PluginInstalledSuccessfully' component={ PluginInstalledSuccessfully } />
         <Stack.Screen name= "NoFinancialSMS" component = {NoFinancialSMS} /> 
         <Stack.Screen name='PreviewOfResult' component={PreviewOfResult} />
         <Stack.Screen name ="AlertMoreThan2Number" component={AlertMoreThan2Number} />
+        <Stack.Screen name ="RequestUpdateAPP" component={ RequestUpdateAPP } />
   
 
       </Stack.Navigator>

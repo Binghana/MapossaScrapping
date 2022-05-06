@@ -30,10 +30,10 @@ function decoupeSMSTransfertMOMO(sms) {
 }
 
 function setAttributeToTransaction(transaction, goodGoodData) {
-  transaction.soldeRestant = goodGoodData[0];
+  transaction.soldeRestant =  parseFloat(goodGoodData[0]);
   transaction.reference = goodGoodData[1];
   transaction._idTransaction = goodGoodData[2];
-  transaction.frais = goodGoodData[3];
+  transaction.frais = parseFloat (goodGoodData[3] );
   transaction.heure = goodGoodData[4];
   transaction.date = goodGoodData[5];
   transaction.numero = goodGoodData[6];

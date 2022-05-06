@@ -23,11 +23,12 @@ function decoupeSMSRetraitMOMO(sms) {
 }
 
 function setAttributeToTransaction(transaction, goodGoodData) {
-  transaction.soldeRestant = goodGoodData[0];
+  
+  transaction.soldeRestant = parseFloat (goodGoodData[0] );
   //transaction.soldeRestant = goodGoodData[1];
   transaction._idTransaction = goodGoodData[2];
-  transaction.frais = goodGoodData[3];
-  transaction.montant = goodGoodData[4];
+  transaction.frais = parseFloat (goodGoodData[3] );
+  transaction.montant = parseFloat (goodGoodData[4] );
   transaction.numRetrait = goodGoodData[5];
   transaction.numero = transaction.numRetrait;
   return transaction;

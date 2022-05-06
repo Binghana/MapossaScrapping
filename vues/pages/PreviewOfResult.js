@@ -63,14 +63,14 @@ export default class PreviewOfResult extends React.Component {
 
                                 <Text style={styles.textNumero}> {this.state.orange.numero} </Text>
                                 <View style={styles.boxFlux}>
-                                    <View>
+                                    <View style= {styles.soloFlux}>
                                         <Text style={styles.textTypeFinal}>Entrant</Text>
                                         <View style={styles.flux}>
                                             <Image style={styles.logoMin} source={imgArrowDown} />
                                             <Text style={styles.textMontant}> {this.state.orange.sommeEntree} FCFA</Text>
                                         </View>
                                     </View>
-                                    <View>
+                                    <View style= {styles.soloFlux}>
                                         <Text style={styles.textTypeFinal}>Sortant</Text>
                                         <View style={styles.flux}>
                                             <Image style={styles.logoMin} source={imgArrowUp} />
@@ -93,14 +93,14 @@ export default class PreviewOfResult extends React.Component {
 
                                 <Text style={styles.textNumero}> {this.state.mtn.numero} </Text>
                                 <View style={styles.boxFlux}>
-                                    <View>
+                                    <View style= {styles.soloFlux}>
                                         <Text style={styles.textTypeFinal}>Entrant</Text>
                                         <View style={styles.flux}>
                                             <Image style={styles.logoMin} source={imgArrowDown} />
                                             <Text style={styles.textMontant}> {this.state.mtn.sommeEntree} FCFA</Text>
                                         </View>
                                     </View>
-                                    <View>
+                                    <View style= {styles.soloFlux}>
                                         <Text style={styles.textTypeFinal}>Sortant</Text>
                                         <View style={styles.flux}>
                                             <Image style={styles.logoMin} source={imgArrowUp} />
@@ -114,7 +114,9 @@ export default class PreviewOfResult extends React.Component {
 
                     </View>
                     <Text style={styles.content} >Accedez à une analyse complète de votre argent dans l’application Mapossa SmartWallet</Text>
-                    <Pressable style={styles.button} >
+                    <Pressable
+                        disabled = {true}
+                     style={styles.button} >
                         <Text style={styles.buttonText}>Ouvrir Mapossa SmartWallet</Text>
                     </Pressable>
 
@@ -125,6 +127,11 @@ export default class PreviewOfResult extends React.Component {
     }
 }
 const styles = StyleSheet.create({
+    soloFlux : {
+        // borderWidth : 1,
+        // borderColor : "blue",
+        marginEnd : 25
+    },  
     flux: {
         // borderWidth : 1,
         // borderColor : "blue",
@@ -136,7 +143,7 @@ const styles = StyleSheet.create({
         width: 220,
         // borderWidth : 1,
         // borderColor : "red",
-        flexDirection: "row"
+        flexDirection: "row",
     },
     boxOME: {
         flexDirection: "row",
@@ -148,8 +155,8 @@ const styles = StyleSheet.create({
     },
     textMontant: {
         color: "black",
-        fontSize: 13,
-        marginStart: 7,
+        fontSize: 15,
+        
         marginEnd: 1
     },
     textTypeFinal: {
@@ -157,7 +164,9 @@ const styles = StyleSheet.create({
         marginStart: 5
     },
     textNumero: {
-        color: "black"
+        color: "black",
+        fontWeight : "bold",
+        fontSize : 18
     },
     boxPreviewTr: {
         //borderWidth: 1,
@@ -221,7 +230,7 @@ const styles = StyleSheet.create({
         height: 40,
         marginHorizontal: "5%",
         borderRadius: 8,
-        backgroundColor: "#FFCC00",
+        backgroundColor: "#ededed",
         marginTop: 25
     },
     buttonText: {

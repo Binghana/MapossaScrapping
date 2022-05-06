@@ -18,13 +18,14 @@ function decoupeSMSDepotOM(sms) {
 }
 
 function setAttributeToTransaction(transaction, goodGoodData) {
+  console.log("God good data de dépôt om")
   console.log(goodGoodData);
-  transaction.soldeRestant = goodGoodData[0];
+  transaction.soldeRestant = parseFloat(goodGoodData[0]);
   //transaction.reference = goodGoodData[1];
   //transaction.commission = goodGoodData[2];
   //transaction.frais = goodGoodData[3];
   transaction._idTransaction = goodGoodData[2];
-  transaction.montant = goodGoodData[3];
+  transaction.montant = parseFloat (goodGoodData[3] );
 
   let i = 4;
   for (i; i < goodGoodData.length; i++) {

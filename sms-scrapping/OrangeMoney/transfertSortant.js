@@ -25,16 +25,18 @@ function decoupeSMSTransfertSortantOM(sms) {
 }
 
 function setAttributeToTransaction(transaction, goodGoodData) {
-  //console.info("Jee découpe le smsm de transfert sortant om")
-  // console.log("Voivi good good data")
-  // console.info(goodGoodData);
-  transaction.soldeRestant = goodGoodData[0];
-  transaction.frais = goodGoodData[5];
+  console.info("Je découpe le sms de transfert sortant om")
+  console.info(goodGoodData);
+  transaction.soldeRestant = parseFloat (goodGoodData[0]);
+  let i = 5;
+  if ( isNaN(goodGoodData[6] )) i--;
+  transaction.frais = parseFloat( goodGoodData[i++] );
   //transaction.commission = goodGoodData[1];
-  transaction.montant = goodGoodData[6];
-  transaction._idTransaction = goodGoodData[7];
 
-  let i = 8;
+  transaction.montant = parseFloat (goodGoodData[i++] );
+  transaction._idTransaction = goodGoodData[i++];
+
+  
   for (i; i < goodGoodData.length; i++) {
     //console.log(i);
     const data = goodGoodData[i];

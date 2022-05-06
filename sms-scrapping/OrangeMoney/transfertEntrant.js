@@ -19,12 +19,12 @@ function decoupeSMSTransfertEntrantMOMO(sms){
     return decoupeSMS(sms, transaction, setAttributeToTransaction, 'OrangeMoney',model);
 }
 function setAttributeToTransaction(transaction, goodGoodData) {
-  // console.info("Jee découpe le smsm de transfert entrant om")
-  // console.log(goodGoodData)
-  transaction.soldeRestant = goodGoodData[0];
+  console.info("Jee découpe le sms de transfert entrant om")
+  console.log(goodGoodData)
+  transaction.soldeRestant = parseFloat (goodGoodData[0] );
   //.reference = goodGoodData[1];
   transaction._idTransaction = goodGoodData[3];
-  transaction.montant = goodGoodData[2];
+  transaction.montant = parseFloat(goodGoodData[2]) ;
   //.frais= goodGoodData[3];
   //transaction.heure = goodGoodData[4];
   //transaction.date = goodGoodData[5];

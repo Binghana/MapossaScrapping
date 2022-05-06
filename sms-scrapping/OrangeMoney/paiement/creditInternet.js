@@ -29,9 +29,9 @@ function setAttributeToTransaction(transaction, goodGoodData) {
     console.log(goodGoodData);
     transaction._idTransaction = goodGoodData[2];
     //transaction.commission = goodGoodData[2];
-    transaction.soldeRestant = goodGoodData[0];
+    transaction.soldeRestant = parseFloat (goodGoodData[0]);
     //transaction.frais = goodGoodData[3]
-    transaction.montant = goodGoodData[1];
+    transaction.montant =parseFloat (goodGoodData[1] );
 
     return transaction;
 }

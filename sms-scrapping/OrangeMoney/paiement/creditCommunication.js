@@ -32,9 +32,9 @@ function setAttributeToTransaction(transaction, goodGoodData) {
     console.log(goodGoodData);
     transaction._idTransaction = goodGoodData[1] + "" + goodGoodData[2];
     //.commission = goodGoodData[2];
-    transaction.soldeRestant = goodGoodData[0];
+    transaction.soldeRestant = parseFloat (goodGoodData[0] );
     //transaction.frais = goodGoodData[3]
-    transaction.montant = goodGoodData[3];
+    transaction.montant = parseFloat (goodGoodData[3]);
 
     return transaction;
 }

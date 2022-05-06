@@ -22,8 +22,9 @@ function decoupeSMSDepotMOMO(sms) {
 }
 
 function setAttributeToTransaction(transaction, goodGoodData) {
+  console.log("good good Data de depot MOMO")
   console.log(goodGoodData)
-  transaction.soldeRestant = goodGoodData[0];
+  transaction.soldeRestant =parseFloat (goodGoodData[0] );
   transaction.reference = goodGoodData[1];
   transaction._idTransaction = goodGoodData[3];
   transaction.heure = goodGoodData[4];
