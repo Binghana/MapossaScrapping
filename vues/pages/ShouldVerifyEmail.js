@@ -23,8 +23,6 @@ export default class ShouldVerifyEmail extends React.Component {
 
                 <View style={styles.boxCentral}>
 
-                    <Image style={styles.appLogo} source={logoMapossaScrapping} />
-
                     <Text style={styles.title} >Vérification d'email</Text>
 
                     <Text style={styles.content} >Veuillez vérifier votre adrese email</Text>

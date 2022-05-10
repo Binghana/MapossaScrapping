@@ -13,7 +13,7 @@ import {
 import { urlConditionGeneralUtilisation, urlPolitiqueConfidentialite } from "../../contollers/APIRequest/Const";
 import { sendCreateUserRequest } from "../../contollers/APIRequest/User";
 import { isGoodEmail } from "../../contollers/RegExp.js"
-import { openUrl, removeSpaceOfString } from "../../contollers/utilities";
+import { openUrl, removeSpaceOfString} from "../../contollers/utilities";
 
 import { ERROR_CGU_NOT_ACCEPTED, ERROR_EMAIL_ALREADY_USE, ERROR_INVALID_EMAIL, ERROR_INVALID_PASSWORD, ERROR_NO_NETWORK, ERROR_UNKNOW_ERROR } from "../../contollers/ErrorMessages";
 
@@ -22,7 +22,7 @@ import { auth } from "../../environment/config";
 const logiMapo = require("../../res/logo_mapossa_scrap.png");
 const loading = require("../../res/loader.gif");
 
-import { browserLocalPersistence, createUserWithEmailAndPassword, setPersistence , sendEmailVerification} from "firebase/auth";
+import {  createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { sdkAuthError } from "../../contollers/SDK-auth-error";
 import { requestPermissions } from "../../contollers/Functions/SMS";
 import { verifyVersion } from "../../contollers/Functions/appManagement";
@@ -51,29 +51,42 @@ export default class PageInscription extends React.Component {
   }
 
   async componentDidMount() {
+    
+    await this.initApp();
+
+  }
+  async initApp() {
     try {
       await verifyVersion()
     } catch (error) {
       if (error.message = "Network Error") {
         this.setState({ isThereError: true, error: JSON.stringify(error) })
-      }else
-      if (error instanceof AppError) {
-        if (error.message == AppError.ERROR_APP_VERSION_DISMATCH) this.gotToPage("RequestUpdateAPP");
-      }
+      } else
+        if (error instanceof AppError) {
+          if (error.message == AppError.ERROR_APP_VERSION_DISMATCH) this.gotToPage("RequestUpdateAPP");
+        }
     }
+      await this.verifyUser()
+  }
+  async verifyUser(){
     const user = auth.currentUser
-    console.log(user)
     if (user) {
+
       let permissionsGranted = await requestPermissions()
-      if (permissionsGranted) this.goToPageActivation();
-      else this.goToPageAccessDenied();
+      if (!permissionsGranted) this.goToPageAccessDenied();
+      if (!user.emailVerified) this.gotToPage("ShouldVerifyEmail");
+      this.gotToPage("PluginInstalledSuccessfully")
+      
     }
 
+  }
+  async componentDidUpdate(){
+    await this.verifyUser()
   }
   gotToPage(pageName, data = {}) {
     console.log("Allons sur la page " + pageName)
     this.props.navigation.navigate(pageName, data);
-}
+  }
   verifyEmail() {
     this.setState({ isEmailGood: isGoodEmail.test(this.state.email) }, () => {
       if (!this.state.isEmailGood) this.setState({
@@ -110,11 +123,12 @@ export default class PageInscription extends React.Component {
 
       console.log(userCredential);
       const user = userCredential.user;
-      
+
       //const res = await createAdaloUser(this.state.email , this.state.password , userCredential.user.uid, userCredential.user.getIdToken() );
       await this.createUserOnFirestore(user.uid)
       await sendEmailVerification(user)
-      
+      console.log("L'email de vérification a été envoyé avec succès")
+
       this.goToPageActivation()
       this.endAsyncOperation()
 
