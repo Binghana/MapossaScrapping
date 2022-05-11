@@ -14,6 +14,7 @@ import PluginInstalledSuccessfully from './vues/pages/PluginInstalledSuccessfull
 import ShouldVerifyEmail from './vues/pages/ShouldVerifyEmail';
 import RequestUpdateAPP from './vues/pages/RequestUpdateAPP';
 import SpalshScreen from './vues/pages/SpalshScreen';
+import Connection from './vues/pages/Connection';
 
 const Stack = createNativeStackNavigator();
 const App = () => {
@@ -27,16 +28,16 @@ const App = () => {
       >
         
         <Stack.Screen name= "SpalshScreen" component = {SpalshScreen} />
-        <Stack.Screen name= "Inscription" component = {PageInscription} />
-       
-        <Stack.Screen name='RequestPermission' component={RequestPermissionReadSMS} />
-        <Stack.Screen name="AutorisationDenied"  component={AutorisationDenied} />
-        <Stack.Screen name='PluginInstalledSuccessfully' component={ PluginInstalledSuccessfully } />
-        <Stack.Screen name= "NoFinancialSMS" component = {NoFinancialSMS} /> 
-        <Stack.Screen name='PreviewOfResult' component={PreviewOfResult} />
-        <Stack.Screen name ="AlertMoreThan2Number" component={AlertMoreThan2Number} />
-        <Stack.Screen name ="RequestUpdateAPP" component={ RequestUpdateAPP } />
-        <Stack.Screen name='ShouldVerifyEmail' component={ShouldVerifyEmail} />
+        <Stack.Screen name= "Inscription" component = {PageInscription} options={{headerLeft: (props) => null }} />
+        <Stack.Screen name= "Connection" component = {Connection} options={{headerLeft: (props) => null }} />
+        <Stack.Screen name='RequestPermission' component={RequestPermissionReadSMS} options={{headerLeft: (props) => null }} />
+        <Stack.Screen name="AutorisationDenied"  component={AutorisationDenied} options={{headerLeft: (props) => null }} />
+        <Stack.Screen name='PluginInstalledSuccessfully' component={ PluginInstalledSuccessfully } options={{headerLeft: (props) => null }} />
+        <Stack.Screen name= "NoFinancialSMS" component = {NoFinancialSMS}  options={{headerLeft: (props) => null }} /> 
+        <Stack.Screen name='PreviewOfResult' component={PreviewOfResult} options={{headerLeft: (props) => null }}  />
+        <Stack.Screen name ="AlertMoreThan2Number" component={AlertMoreThan2Number} options={{headerLeft: (props) => null }} />
+        <Stack.Screen name ="RequestUpdateAPP" component={ RequestUpdateAPP } options={{headerLeft: (props) => null }} />
+        <Stack.Screen name='ShouldVerifyEmail' component={ShouldVerifyEmail} options={{headerLeft: (props) => null }} />
   
 
       </Stack.Navigator>

@@ -42,17 +42,36 @@ export default class PluginInstalledSuccessfully extends React.Component {
                             await createUsersCompteFinanciers(data);
 
                             await createAutoTransaction(data);
-
+                            await storage.set(storageKey.lastScrappingDate, new Date().getTime().toString())
                             const OMEInfo = await this.getOMEfinancialInformations();
-                            await storage.set(storageKey.lastScrappingDate, new Date().getTime().toString() )
+
                             this.gotToPage("PreviewOfResult", OMEInfo);
+
                         } catch (error) {
                             console.log("on a throw l'erruer au niveau de puliffin succ ")
                             console.log(error);
                             if (error.message == "Network Error") console.log("erreur pas de connection")
                             if (error instanceof ScrappingError) {
                                 if (error.code == ScrappingError.ERROR_MORE_THAN_2_NUMBERS) return this.gotToPage("AlertMoreThan2Number");
-                                if (error.code == ScrappingError.ERROR_NO_FINANCIAL_SMS) return this.gotToPage("NoFinancialSMS");
+                                if (error.code == ScrappingError.ERROR_NO_FINANCIAL_SMS) {
+
+                                    const comptesFinanciers = await getUserAllCompteFinanciers();
+                                    if (res.data.data) {
+                                        /**
+                                         * @type {Array}
+                                         */
+                                        const comptes = res.data.data;
+                                        if (comptes.length > 0) {
+                                            const OMEInfo = await this.getOMEfinancialInformations(comptes);
+                                            this.gotToPage("PreviewOfResult", OMEInfo);
+                                        } else {
+                                            this.gotToPage("NoFinancialSMS");
+                                        }
+                                    } else {
+                                        this.gotToPage("NoFinancialSMS");
+                                    }
+
+                                }
                             }
                         }
 
@@ -66,30 +85,49 @@ export default class PluginInstalledSuccessfully extends React.Component {
 
         }
     }
-    async getOMEfinancialInformations() {
+    async getOMEfinancialInformations(data) {
+        if (!data) {
+            const res = await getUserAllCompteFinanciers();
+            if (res.data.data) {
+                /**
+                 * @type {Array}
+                 */
+                const comptes = res.data.data;
+                const compteOrange = comptes.find(c => c.nomOperateur == om.address);
+                const compteMTN = comptes.find(c => c.nomOperateur == momo.address);
+                console.log(compteOrange);
+                console.log(compteMTN)
+                console.log("on a bien récupéreé les informations des OME");
 
-        const res = await getUserAllCompteFinanciers();
-        if (res.data.data) {
-            /**
-             * @type {Array}
-             */
-            const comptes = res.data.data;
-            const compteOrange = comptes.find (c => c.nomOperateur == om.address);
-            const compteMTN = comptes.find (c => c.nomOperateur == momo.address);
-            console.log(compteOrange);
-            console.log(compteMTN)
-            console.log("on a bien récupéreé les informations des OME");
-
-            const OMEInfo = {
-                orangeNumber: (compteOrange)? compteOrange.numero : "-",
-                orangeSommeEntree:  (compteOrange)? compteOrange.sommeEntree : 0,
-                orangeSommeSortie:  (compteOrange)? compteOrange.sommeSortie : 0,
-                mtnNumber:  (compteMTN)? compteMTN.numero : "-",
-                mtnSommeEntree: (compteMTN)? compteMTN.sommeEntree : 0,
-                mtnSommeSortie: (compteMTN)? compteMTN.sommeSortie : 0,
+                const OMEInfo = {
+                    orangeNumber: (compteOrange) ? compteOrange.numero : "-",
+                    orangeSommeEntree: (compteOrange) ? compteOrange.sommeEntree : 0,
+                    orangeSommeSortie: (compteOrange) ? compteOrange.sommeSortie : 0,
+                    mtnNumber: (compteMTN) ? compteMTN.numero : "-",
+                    mtnSommeEntree: (compteMTN) ? compteMTN.sommeEntree : 0,
+                    mtnSommeSortie: (compteMTN) ? compteMTN.sommeSortie : 0,
+                }
+                return OMEInfo;
             }
-            return OMEInfo;
+        }else {
+                const comptes = data;
+                const compteOrange = comptes.find(c => c.nomOperateur == om.address);
+                const compteMTN = comptes.find(c => c.nomOperateur == momo.address);
+                console.log(compteOrange);
+                console.log(compteMTN)
+                console.log("on a bien récupéreé les informations des OME");
+
+                const OMEInfo = {
+                    orangeNumber: (compteOrange) ? compteOrange.numero : "-",
+                    orangeSommeEntree: (compteOrange) ? compteOrange.sommeEntree : 0,
+                    orangeSommeSortie: (compteOrange) ? compteOrange.sommeSortie : 0,
+                    mtnNumber: (compteMTN) ? compteMTN.numero : "-",
+                    mtnSommeEntree: (compteMTN) ? compteMTN.sommeEntree : 0,
+                    mtnSommeSortie: (compteMTN) ? compteMTN.sommeSortie : 0,
+                }
+                return OMEInfo;
         }
+
 
 
     }

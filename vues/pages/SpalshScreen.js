@@ -38,6 +38,7 @@ export default class SpalshScreen extends React.Component {
         await this.verifyUser()
     }
     async verifyUser() {
+       
         const user = auth.currentUser
         if (user) {
             console.log("On reconnait qu'il ya un utilisateur")
@@ -48,7 +49,7 @@ export default class SpalshScreen extends React.Component {
 
         }else {
             console.log("Il n'ya pas d'utilisateur connecté")
-            this.goToPage("Inscription")
+            this.goToPage("Connection")
         }
 
     }
