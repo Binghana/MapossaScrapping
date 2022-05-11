@@ -25,10 +25,10 @@ export default class ShouldVerifyEmail extends React.Component {
         return auth.currentUser.emailVerified;
     }
     componentDidMount() {
-
-        if (this.props.navigation.params) {
-            if (this.props.navigation.params.email) {
-                this.setState({ email: this.props.navigation.params.email })
+        console.log(this.props.navigation.reset)
+        if (this.props.route.params) {
+            if (this.props.route.params.email) {
+                this.setState({ email: this.props.route.params.email })
             }
         }
 
@@ -48,7 +48,7 @@ export default class ShouldVerifyEmail extends React.Component {
                     <Text style={styles.content} >Nous vous avons envoyé un email de confirmation. Consultez votre boite de reception et cliquez sur le lien pour confirmer votre adresse email.</Text>
 
                     <Pressable style={styles.button} onPress={() => { this.goToPage("RequestPermission") }} >
-                        <Text style={styles.buttonText}>J'ai déjà vérifier mon email</Text>
+                        <Text style={styles.buttonText}>Ok</Text>
                     </Pressable>
                     { this.state.isThereError && <Text style = {styles.textError} > {this.state.errorMessage}</Text>}
 
@@ -110,14 +110,14 @@ const styles = StyleSheet.create({
     button: {
         alignItems: "center",
         justifyContent: "center",
-        height: 30,
+        height: 50,
         marginTop: 50,
         borderRadius: 8,
-        backgroundColor: "#cdcdcd"
+        backgroundColor: "#ffcc00"
     },
     buttonText: {
-        fontSize: 11,
-        //fontHeight: 12,
+        fontSize: 16,
+      
        
         color: '#ffffff',
     }

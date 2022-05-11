@@ -25,9 +25,10 @@ const App = () => {
           headerShown : false
         }}
       >
+        
         <Stack.Screen name= "SpalshScreen" component = {SpalshScreen} />
         <Stack.Screen name= "Inscription" component = {PageInscription} />
-        <Stack.Screen name='ShouldVerifyEmail' component={ShouldVerifyEmail} />
+       
         <Stack.Screen name='RequestPermission' component={RequestPermissionReadSMS} />
         <Stack.Screen name="AutorisationDenied"  component={AutorisationDenied} />
         <Stack.Screen name='PluginInstalledSuccessfully' component={ PluginInstalledSuccessfully } />
@@ -35,6 +36,7 @@ const App = () => {
         <Stack.Screen name='PreviewOfResult' component={PreviewOfResult} />
         <Stack.Screen name ="AlertMoreThan2Number" component={AlertMoreThan2Number} />
         <Stack.Screen name ="RequestUpdateAPP" component={ RequestUpdateAPP } />
+        <Stack.Screen name='ShouldVerifyEmail' component={ShouldVerifyEmail} />
   
 
       </Stack.Navigator>

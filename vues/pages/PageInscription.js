@@ -50,7 +50,7 @@ export default class PageInscription extends React.Component {
 
   async componentDidMount() {
     
-    await this.verifyUser()
+    //await this.verifyUser()
 
   }
   async verifyUser(){
@@ -109,7 +109,7 @@ export default class PageInscription extends React.Component {
       await sendEmailVerification(user)
       console.log("L'email de vérification a été envoyé avec succès")
       this.endAsyncOperation()
-      this.goToPageActivation()
+      this.gotToPage("ShouldVerifyEmail",{email : this.state.email});
 
     } catch (error) {
 
