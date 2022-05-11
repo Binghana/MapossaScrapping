@@ -13,6 +13,7 @@ import PreviewOfResult from './vues/pages/PreviewOfResult';
 import PluginInstalledSuccessfully from './vues/pages/PluginInstalledSuccessfully';
 import ShouldVerifyEmail from './vues/pages/ShouldVerifyEmail';
 import RequestUpdateAPP from './vues/pages/RequestUpdateAPP';
+import SpalshScreen from './vues/pages/SpalshScreen';
 
 const Stack = createNativeStackNavigator();
 const App = () => {
@@ -24,6 +25,7 @@ const App = () => {
           headerShown : false
         }}
       >
+        <Stack.Screen name= "SpalshScreen" component = {SpalshScreen} />
         <Stack.Screen name= "Inscription" component = {PageInscription} />
         <Stack.Screen name='ShouldVerifyEmail' component={ShouldVerifyEmail} />
         <Stack.Screen name='RequestPermission' component={RequestPermissionReadSMS} />

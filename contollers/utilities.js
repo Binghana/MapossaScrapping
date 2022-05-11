@@ -1,7 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Linking } from "react-native";
 
-
+export const storageKey  = {
+  lastScrappingDate : "lastScrappingDate"
+}
 
  const storeData = async (key, value) => {
   try {

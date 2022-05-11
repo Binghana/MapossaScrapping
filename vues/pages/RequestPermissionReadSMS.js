@@ -7,15 +7,27 @@ import {
     Pressable,
     ScrollView,
 } from "react-native";
-import { requestPermissions } from "../../contollers/Functions/SMS";
+import { isPermissionGranted, requestPermissions } from "../../contollers/Functions/SMS";
 
 import { logoOrange, logoMTN, logoMapossaScrapping } from "../../res/Images"
 
 
 
 export default class RequestPermissionReadSMS extends React.Component {
+    async componentDidMount(){
+        const permissionAlreadyGranted = await isPermissionGranted();
+        
+        if (permissionAlreadyGranted){ 
+            
+            console.log("La permissions a dékà été accordé")
+            this.goToPage("PluginInstalledSuccessfully")
     
-    async requestPermissions() {
+        }else console.log("La permissions n'a pas encore été accordé");
+        
+    }
+
+    async startRequestPermissions() {
+        console.log("demandons la permissions")
         const permissionsGranted = await requestPermissions();
         if (permissionsGranted) this.goToPage("PluginInstalledSuccessfully"); 
         else this.goToPage("AutorisationDenied");
@@ -44,7 +56,7 @@ export default class RequestPermissionReadSMS extends React.Component {
 
                     <Text style={styles.content} >pour retrouver vos transactions passées et vous permettre de les catégoriser</Text>
 
-                    <Pressable style={styles.button} onPress={() => { this.requestPermissions() }} >
+                    <Pressable style={styles.button} onPress={() => { this.startRequestPermissions() }} >
                         <Text style={styles.buttonText}>Autoriser</Text>
                     </Pressable>
 

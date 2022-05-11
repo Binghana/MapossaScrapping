@@ -10,12 +10,13 @@ import {
 import { imgWorkingAPI } from "../../res/Images"
 import SmsAndroid from "react-native-get-sms-android-v2";
 import { createAutoTransaction, createUsersCompteFinanciers } from "../../contollers/Functions/appManagement";
-import { requestPermissions, filter } from "../../contollers/Functions/SMS";
+import { requestPermissions, filter, isPermissionGranted } from "../../contollers/Functions/SMS";
 import ScrappingError from "../../contollers/ScrappingError";
 import { scrap } from "../../contollers/Functions/scrap";
 import { getUserAllCompteFinanciers } from "../../contollers/APIRequest/CompteFinanciers";
 import om from "../../sms-scrapping/OrangeMoney/om";
 import momo from "../../sms-scrapping/MOMO/momo";
+import { storage, storageKey } from "../../contollers/utilities";
 export default class PluginInstalledSuccessfully extends React.Component {
     constructor(props) {
         super(props)
@@ -24,7 +25,7 @@ export default class PluginInstalledSuccessfully extends React.Component {
         try {
 
             console.log("Nous sommes arrivés sur la page de succès d'installation du plugin")
-            if (await requestPermissions()) {
+            if (await isPermissionGranted()) {
                 console.log("Récuperons les sms de l'utilisateur")
                 return SmsAndroid.list(
                     JSON.stringify(filter),
@@ -34,11 +35,16 @@ export default class PluginInstalledSuccessfully extends React.Component {
                     async (count, smsList) => {
                         try {
                             const tabSMS = JSON.parse(smsList)
-                            console.log("on a récupéré" + tabSMS.count)
+                            console.log("on a récupéré" + count)
+
                             const data = await scrap(tabSMS);
+
                             await createUsersCompteFinanciers(data);
+
                             await createAutoTransaction(data);
+
                             const OMEInfo = await this.getOMEfinancialInformations();
+                            await storage.set(storageKey.lastScrappingDate, new Date().getTime().toString() )
                             this.gotToPage("PreviewOfResult", OMEInfo);
                         } catch (error) {
                             console.log("on a throw l'erruer au niveau de puliffin succ ")
@@ -54,7 +60,7 @@ export default class PluginInstalledSuccessfully extends React.Component {
                     },
                 );
             } else {
-                throw new Error("Impossible de lire les sms de l'utilisateur car la permissions a été refusé");
+                this.gotToPage("AutorisationDenied")
             }
         } catch (error) {
 

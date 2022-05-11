@@ -8,7 +8,6 @@ import {
   Pressable,
   ScrollView,
   TextInput,
-  //ActivityIndicator
 } from "react-native";
 import { urlConditionGeneralUtilisation, urlPolitiqueConfidentialite } from "../../contollers/APIRequest/Const";
 import { sendCreateUserRequest } from "../../contollers/APIRequest/User";
@@ -22,11 +21,10 @@ import { auth } from "../../environment/config";
 const logiMapo = require("../../res/logo_mapossa_scrap.png");
 const loading = require("../../res/loader.gif");
 
-import {  createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { sdkAuthError } from "../../contollers/SDK-auth-error";
-import { requestPermissions } from "../../contollers/Functions/SMS";
-import { verifyVersion } from "../../contollers/Functions/appManagement";
-import { AppError } from "../../contollers/appData";
+import {isPermissionGranted } from "../../contollers/Functions/SMS";
+
 
 
 export default class PageInscription extends React.Component {
@@ -52,36 +50,20 @@ export default class PageInscription extends React.Component {
 
   async componentDidMount() {
     
-    await this.initApp();
+    await this.verifyUser()
 
-  }
-  async initApp() {
-    try {
-      await verifyVersion()
-    } catch (error) {
-      if (error.message = "Network Error") {
-        this.setState({ isThereError: true, error: JSON.stringify(error) })
-      } else
-        if (error instanceof AppError) {
-          if (error.message == AppError.ERROR_APP_VERSION_DISMATCH) this.gotToPage("RequestUpdateAPP");
-        }
-    }
-      await this.verifyUser()
   }
   async verifyUser(){
     const user = auth.currentUser
     if (user) {
 
-      let permissionsGranted = await requestPermissions()
+      let permissionsGranted = await isPermissionGranted()
       if (!permissionsGranted) this.goToPageAccessDenied();
       if (!user.emailVerified) this.gotToPage("ShouldVerifyEmail");
       this.gotToPage("PluginInstalledSuccessfully")
       
     }
 
-  }
-  async componentDidUpdate(){
-    await this.verifyUser()
   }
   gotToPage(pageName, data = {}) {
     console.log("Allons sur la page " + pageName)
@@ -118,20 +100,16 @@ export default class PageInscription extends React.Component {
 
     try {
       this.startAsyncOperation();
-      //await setPersistence(auth,browserLocalPersistence)
       const userCredential = await createUserWithEmailAndPassword(auth, this.state.email, this.state.password);
 
       console.log(userCredential);
       const user = userCredential.user;
 
-      //const res = await createAdaloUser(this.state.email , this.state.password , userCredential.user.uid, userCredential.user.getIdToken() );
       await this.createUserOnFirestore(user.uid)
       await sendEmailVerification(user)
       console.log("L'email de vérification a été envoyé avec succès")
-
-      this.goToPageActivation()
       this.endAsyncOperation()
-
+      this.goToPageActivation()
 
     } catch (error) {
 
@@ -141,9 +119,9 @@ export default class PageInscription extends React.Component {
       console.log(errorMessage)
       this.setState({ isThereError: true, error: JSON.stringify(error) })
       this.endAsyncOperation()
-    }
+    } 
 
-    this.endAsyncOperation();
+    
   }
 
   async createUserOnFirestore(uid, idAdalo = 0) {
@@ -165,7 +143,7 @@ export default class PageInscription extends React.Component {
     this.setState({ isLoading: true, isButtonDisabled: true })
   }
   endAsyncOperation(disable = false) {
-    console.log("Fin de l'opération asynchrone de l'opération")
+    console.log("Fin de l'opération asynchrone")
     this.setState({ isLoading: false, isButtonDisabled: disable })
   }
   acceptCGUAndPrivacyPolicy(accepted) {

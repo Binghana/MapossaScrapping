@@ -8,4 +8,6 @@ export const imgArrowUp = require("./up-arrow_2.png");
 export const imgArrowDown = require("./down-arrow_1.png");
 export const logoMessenger = require("./Facebook_Messenger_logo_2020.svg.png");/** attente de la bonne image la bonn image */
 
-export const imgWorkingAPI = require("./LogoScrap.png")
+export const imgWorkingAPI = require("./LogoScrap.png");
+export const logoEmail = require("./email.png");
+export const splashScreenLogo = require("./favicon-app_scrap_transparent.png");

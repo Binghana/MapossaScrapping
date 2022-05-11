@@ -36,8 +36,7 @@ export async function requestPermissions() {
       console.log("requesting SMS permissions");
       granted = await PermissionsAndroid.requestMultiple(
         [
-          PermissionsAndroid.PERMISSIONS.READ_SMS,
-          PermissionsAndroid.PERMISSIONS.SEND_SMS
+          PermissionsAndroid.PERMISSIONS.READ_SMS
         ],
         {
           title: "Example App SMS Features",
@@ -47,8 +46,7 @@ export async function requestPermissions() {
           buttonPositive: "OK"
         }
       );
-     console.log( granted)
-     console.log( PermissionsAndroid.RESULTS.GRANTED)
+
       if (granted["android.permission.READ_SMS"] === PermissionsAndroid.RESULTS.GRANTED) {
         console.log("You can use SMS features");
         return true;
@@ -61,31 +59,6 @@ export async function requestPermissions() {
     }
   }
 
-// export async function getAllSMS() {
-//     try {
-//         console.log( "commencons")
-//       if (await requestPermissions() ){
-//         console.log("on peut lire les sms")
-//         let tabSMS = [] ;
-//         return SmsAndroid.list(
-//           JSON.stringify(filter),
-//           fail => {
-//             throw fail;
-//           },
-//           async (count, smsList) => {
-//             console.log('Count: ', count);
-//             tabSMS = JSON.parse(smsList);
-//             console.log("on a fini de remplir")
-          
-//           },
-//         );
-//         // console.log(tabSMS)
-//         //return tabSMS ;
-//       }else {
-//         throw new Error("Impossible de lire les sms de l'utilisateur car la permissions a été refusé");
-//       }
-      
-//     } catch (error) {
-//       throw error ;
-//     }
-//   }
+  export async function isPermissionGranted (){
+    return await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_SMS)
+  }
