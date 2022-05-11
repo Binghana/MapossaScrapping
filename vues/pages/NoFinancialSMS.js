@@ -32,6 +32,7 @@ export default class NoFinancialSMS extends React.Component {
         }
     }
     setUpNumber(operator) {
+        console.log("Regardons le numéro entré")
         if (this.verifyNumber(operator)) {
 
             if (!this.state.isOneNumberGot) {

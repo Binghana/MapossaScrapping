@@ -30,7 +30,7 @@ export async function sendCreateCompteFinancier(operateur, numero) {
     "idOperateur": getIdOperateur(operateur),
     "sommeSortie": 0,
     "sommeEntree": 0,
-    //"logoOperateur": getLogoOperateur(operateur),
+    "logoOperateur": getLogoOperateur(operateur),
     "nomOperateur" : operateur
   });
 
