@@ -14,7 +14,7 @@ import { sendCreateUserRequest } from "../../contollers/APIRequest/User";
 import { isGoodEmail } from "../../contollers/RegExp.js"
 import { openUrl, removeSpaceOfString } from "../../contollers/utilities";
 
-import { ERROR_CGU_NOT_ACCEPTED, ERROR_EMAIL_ALREADY_USE, ERROR_INVALID_EMAIL, ERROR_INVALID_PASSWORD, ERROR_NO_NETWORK, ERROR_UNKNOW_ERROR } from "../../contollers/ErrorMessages";
+import { ERROR_CGU_NOT_ACCEPTED, ERROR_EMAIL_ALREADY_USE, ERROR_INVALID_EMAIL, ERROR_INVALID_PASSWORD, ERROR_NO_NETWORK, ERROR_UNKNOW_ERROR, ERROR_WEAK_PASSWORD } from "../../contollers/ErrorMessages";
 
 import { auth } from "../../environment/config";
 
@@ -82,7 +82,7 @@ export default class PageInscription extends React.Component {
   verifyPassword() {
     this.setState({ isPassWordGood: this.state.password.length > 7 }, () => {
       if (!this.state.isPassWordGood) this.setState({
-        isThereError: true, error: JSON.stringify({ message: ERROR_INVALID_PASSWORD })
+        isThereError: true, error: JSON.stringify({ message: ERROR_WEAK_PASSWORD })
 
       })
       this.enableButton()
@@ -111,7 +111,7 @@ export default class PageInscription extends React.Component {
       console.log("L'email de vérification a été envoyé avec succès")
       this.endAsyncOperation()
       this.gotToPage("ShouldVerifyEmail", { email: this.state.email });
-
+      
     } catch (error) {
 
       console.log(error)
@@ -201,7 +201,7 @@ export default class PageInscription extends React.Component {
       }
     }
     if (err.message == ERROR_INVALID_EMAIL) return ERROR_INVALID_EMAIL;
-    if (err.message == ERROR_INVALID_PASSWORD) return ERROR_INVALID_PASSWORD;
+    if (err.message == ERROR_WEAK_PASSWORD) return ERROR_WEAK_PASSWORD;
 
     return ERROR_UNKNOW_ERROR;
   }
@@ -327,11 +327,11 @@ export default class PageInscription extends React.Component {
 }
 const styles = StyleSheet.create({
   textLow: {
-    marginTop: 10,
-    color: "black",
-    alignSelf: "center",
+        marginTop: 10,
+        color: "black",
+        alignSelf: "center",
 
-},
+    },
   textError: {
     color: "red",
     alignSelf: "center",

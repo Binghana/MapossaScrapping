@@ -9,19 +9,19 @@ import {
     ScrollView,
     TextInput,
 } from "react-native";
-import { urlConditionGeneralUtilisation, urlPolitiqueConfidentialite } from "../../contollers/APIRequest/Const";
-import { sendCreateUserRequest } from "../../contollers/APIRequest/User";
-import { isGoodEmail } from "../../contollers/RegExp.js"
-import { openUrl, removeSpaceOfString } from "../../contollers/utilities";
 
-import { ERROR_CGU_NOT_ACCEPTED, ERROR_EMAIL_ALREADY_USE, ERROR_INVALID_EMAIL, ERROR_INVALID_PASSWORD, ERROR_NO_NETWORK, ERROR_UNKNOW_ERROR } from "../../contollers/ErrorMessages";
+
+import { isGoodEmail } from "../../contollers/RegExp.js"
+import { removeSpaceOfString } from "../../contollers/utilities";
+
+import { ERROR_EMAIL_NOT_REGISTERED, ERROR_INVALID_EMAIL, ERROR_INVALID_PASSWORD, ERROR_NO_NETWORK, ERROR_UNKNOW_ERROR, ERROR_USER_DISABLED, ERROR_WEAK_PASSWORD } from "../../contollers/ErrorMessages";
 
 import { auth } from "../../environment/config";
 
 const logiMapo = require("../../res/logo_mapossa_scrap.png");
 const loading = require("../../res/loader.gif");
 
-import { browserLocalPersistence, createUserWithEmailAndPassword, sendEmailVerification, signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { sdkAuthError } from "../../contollers/SDK-auth-error";
 import { isPermissionGranted } from "../../contollers/Functions/SMS";
 
@@ -38,7 +38,7 @@ export default class Connection extends React.Component {
             isEmailGood: false,
             password: "",
             isPassWordGood: false,
-            isTermsOfuseAndPrivacyPolicyAccepted: false,
+            isTermsOfuseAndPrivacyPolicyAccepted: true,
             isLoading: false,
             isThereError: false,
             error: {
@@ -48,23 +48,6 @@ export default class Connection extends React.Component {
 
     }
 
-    async componentDidMount() {
-
-        //await this.verifyUser()
-
-    }
-    async verifyUser() {
-        const user = auth.currentUser
-        if (user) {
-
-            let permissionsGranted = await isPermissionGranted()
-            if (!permissionsGranted) this.goToPageAccessDenied();
-            if (!user.emailVerified) this.gotToPage("ShouldVerifyEmail");
-            this.gotToPage("PluginInstalledSuccessfully")
-
-        }
-
-    }
     gotToPage(pageName, data = {}) {
         console.log("Allons sur la page " + pageName)
         this.props.navigation.navigate(pageName, data);
@@ -82,7 +65,7 @@ export default class Connection extends React.Component {
     verifyPassword() {
         this.setState({ isPassWordGood: this.state.password.length > 7 }, () => {
             if (!this.state.isPassWordGood) this.setState({
-                isThereError: true, error: JSON.stringify({ message: ERROR_INVALID_PASSWORD })
+                isThereError: true, error: JSON.stringify({ message: ERROR_WEAK_PASSWORD })
 
             })
             this.enableButton()
@@ -90,9 +73,7 @@ export default class Connection extends React.Component {
     }
 
     enableButton() {
-        let res = this.state.isEmailGood && this.state.isPassWordGood && this.state.isTermsOfuseAndPrivacyPolicyAccepted
-        console.log(res)
-
+        let res = this.state.isEmailGood && this.state.isPassWordGood 
         this.setState({ isButtonDisabled: !res });
     }
 
@@ -100,7 +81,7 @@ export default class Connection extends React.Component {
 
         try {
             this.startAsyncOperation();
-            await auth.setPersistence(browserLocalPersistence)
+            
             const userCredential = await signInWithEmailAndPassword(auth, this.state.email, this.state.password);
 
             console.log(userCredential);
@@ -124,21 +105,6 @@ export default class Connection extends React.Component {
 
 
     }
-
-    async createUserOnFirestore(uid, idAdalo = 0) {
-        try {
-            // console.log(uid)
-            // console.log("mettons les données sur firestore")
-            // collection(db , "users")
-            // const docRef = await setDoc( doc(db,"users",uid), {
-            //     idAdalo : idAdalo,
-            // });
-            const res = await sendCreateUserRequest(uid);
-            console.log("Document written with ID: ", res.data);
-        } catch (e) {
-            console.error("Error adding document: ", e);
-        }
-    }
     startAsyncOperation() {
         console.log("Une operation asynchrone commence, montrons le loading")
         this.setState({ isLoading: true, isButtonDisabled: true })
@@ -147,24 +113,7 @@ export default class Connection extends React.Component {
         console.log("Fin de l'opération asynchrone")
         this.setState({ isLoading: false, isButtonDisabled: disable })
     }
-    acceptCGUAndPrivacyPolicy(accepted) {
-        console.log("checkons les cgu")
-        if (accepted) {
-            this.setState({ isTermsOfuseAndPrivacyPolicyAccepted: true }, async () => {
-                this.enableButton()
-            })
-        } else {
-            this.setState({ isTermsOfuseAndPrivacyPolicyAccepted: false }, () => {
 
-                this.setState({
-                    isThereError: true, error: JSON.stringify({ message: ERROR_CGU_NOT_ACCEPTED })
-                })
-
-                console.log("metton à jour le bouton")
-                this.enableButton()
-            })
-        }
-    }
     goToPageActivation() {
         console.log("Allons sur la page de demande d'autorisation")
         this.props.navigation.navigate('RequestPermission');
@@ -180,9 +129,11 @@ export default class Connection extends React.Component {
         console.log(err)
         if ("code" in err) {
             const errorcode = err.code;
-            if (errorcode == sdkAuthError.EMAIL_EXISTS) return ERROR_EMAIL_ALREADY_USE;
+            if (errorcode == sdkAuthError.INVALID_EMAIL ) return ERROR_INVALID_EMAIL ;
             if (errorcode == sdkAuthError.NETWORK_REQUEST_FAILED) return ERROR_NO_NETWORK;
-
+            if (errorcode == sdkAuthError.INVALID_PASSWORD) return ERROR_INVALID_PASSWORD;
+            if (errorcode == sdkAuthError.USER_DELETED) return ERROR_EMAIL_NOT_REGISTERED;
+            if (errorcode == sdkAuthError.USER_DISABLED) return ERROR_USER_DISABLED;
             return err.code;
 
         }
@@ -201,7 +152,7 @@ export default class Connection extends React.Component {
             }
         }
         if (err.message == ERROR_INVALID_EMAIL) return ERROR_INVALID_EMAIL;
-        if (err.message == ERROR_INVALID_PASSWORD) return ERROR_INVALID_PASSWORD;
+        if (err.message == ERROR_WEAK_PASSWORD) return ERROR_WEAK_PASSWORD;
 
         return ERROR_UNKNOW_ERROR;
     }

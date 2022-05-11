@@ -38,18 +38,24 @@ export default class SpalshScreen extends React.Component {
         await this.verifyUser()
     }
     async verifyUser() {
-       
+        auth.onAuthStateChanged((user)=>{
+            console.log("auth state changed")
+            console.log(user)
+        })
         const user = auth.currentUser
         if (user) {
             console.log("On reconnait qu'il ya un utilisateur")
+            console.log(user)
             let permissionsGranted = await isPermissionGranted()
-            if (!permissionsGranted) this.goToPageAccessDenied();
-            if (!user.emailVerified) this.goToPage("ShouldVerifyEmail");
-            this.goToPage("PluginInstalledSuccessfully")
+            if (!user.emailVerified) return this.goToPage("ShouldVerifyEmail");
+            if (!permissionsGranted) return this.goToPage("AutorisationDenied");
+            
+            return this.goToPage("PluginInstalledSuccessfully")
 
         }else {
+            
             console.log("Il n'ya pas d'utilisateur connecté")
-            this.goToPage("Connection")
+            return this.goToPage("Connection")
         }
 
     }

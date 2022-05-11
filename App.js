@@ -26,10 +26,12 @@ const App = () => {
           headerShown : false
         }}
       >
-        
+       
+       
         <Stack.Screen name= "SpalshScreen" component = {SpalshScreen} />
         <Stack.Screen name= "Inscription" component = {PageInscription} options={{headerLeft: (props) => null }} />
         <Stack.Screen name= "Connection" component = {Connection} options={{headerLeft: (props) => null }} />
+        <Stack.Screen name='ShouldVerifyEmail' component={ShouldVerifyEmail} options={{headerLeft: (props) => null }} /> 
         <Stack.Screen name='RequestPermission' component={RequestPermissionReadSMS} options={{headerLeft: (props) => null }} />
         <Stack.Screen name="AutorisationDenied"  component={AutorisationDenied} options={{headerLeft: (props) => null }} />
         <Stack.Screen name='PluginInstalledSuccessfully' component={ PluginInstalledSuccessfully } options={{headerLeft: (props) => null }} />
@@ -37,9 +39,7 @@ const App = () => {
         <Stack.Screen name='PreviewOfResult' component={PreviewOfResult} options={{headerLeft: (props) => null }}  />
         <Stack.Screen name ="AlertMoreThan2Number" component={AlertMoreThan2Number} options={{headerLeft: (props) => null }} />
         <Stack.Screen name ="RequestUpdateAPP" component={ RequestUpdateAPP } options={{headerLeft: (props) => null }} />
-        <Stack.Screen name='ShouldVerifyEmail' component={ShouldVerifyEmail} options={{headerLeft: (props) => null }} />
-  
-
+    
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -7,6 +7,8 @@ import {
     Pressable,
     ScrollView,
 } from "react-native";
+import { ERROR_EMAIL_NOT_VERIFIED } from "../../contollers/ErrorMessages";
+import { isPermissionGranted } from "../../contollers/Functions/SMS";
 import { auth } from "../../environment/config";
 
 
@@ -21,21 +23,37 @@ export default class ShouldVerifyEmail extends React.Component {
         }
     }
 
-    isEmailVerified(){
+    isUserEmailVerified(){
         return auth.currentUser.emailVerified;
     }
     componentDidMount() {
-        console.log(this.props.navigation.reset())
+        
         if (this.props.route.params) {
             if (this.props.route.params.email) {
-                this.setState({ email: this.props.route.params.email })
+                this.setState({ email: this.props.route.params.email }, ()=>{
+                    setTimeout(()=>{
+                        this.doingNewAction();
+                    }, 10000)
+                })
             }
         }
 
     }
+    
+    async verifyIfUserHasVErifiedEmail(){
+        if(this.isUserEmailVerified()){
+            if (!await isPermissionGranted()) return this.goToPage("RequestPermission");
+            return this.goToPage("PluginInstalledSuccessfully");
+        }else {
+            this.setState({isThereError : true , errorMessage : ERROR_EMAIL_NOT_VERIFIED })
+        }
+    }
     goToPage(pageName) {
         console.log("Allons sur la page " + pageName)
         this.props.navigation.navigate(pageName);
+    }
+    doingNewAction(){
+        this.setState({isThereError : false })
     }
     render() {
         return (
@@ -45,11 +63,11 @@ export default class ShouldVerifyEmail extends React.Component {
 
                     <Text style={styles.title} >Confirmez votre adresse email</Text>
                     <Text style={styles.email} > {this.state.email} </Text>
-                    <Text style={styles.content} >Nous vous avons envoyé un email de confirmation. Consultez votre boite de reception et cliquez sur le lien pour confirmer votre adresse email.</Text>
+                    <Text style={styles.content} >Nous vous avons envoyé un email de confirmation. Consultez votre boite de reception et cliquez sur le lien pour confirmer votre adresse email. Ensuite cliquez sur le bouton ci-dessous pour continuer</Text>
 
-                    {/* <Pressable style={styles.button} onPress={() => { this.goToPage("RequestPermission") }} >
-                        <Text style={styles.buttonText}>Ok</Text>
-                    </Pressable> */}
+                    <Pressable style={styles.button} onPress={() => { this.verifyIfUserHasVErifiedEmail() }} >
+                        <Text style={styles.buttonText}>J'ai déjà vérifié mon email</Text>
+                    </Pressable>
                     { this.state.isThereError && <Text style = {styles.textError} > {this.state.errorMessage}</Text>}
 
                 </View>
@@ -67,9 +85,9 @@ const styles = StyleSheet.create({
     title : {
         marginTop : 30,
         color  : "#434343",
-        fontSize : 18,
+        fontSize : 22,
         alignSelf : "center",
-        fontWeight : "500"
+        fontWeight : "600"
     },
     image: {
         marginTop : 120,
@@ -78,9 +96,9 @@ const styles = StyleSheet.create({
         alignSelf : "center"
     },
     email: {
-        marginTop: 20,
+        marginTop: 10,
         color : "black",
-        fontSize : 24,
+        fontSize : 18,
         fontWeight : "bold",
         alignSelf : "center"
     },
@@ -103,8 +121,8 @@ const styles = StyleSheet.create({
         marginTop: 25,
         padding: 10,
         textAlign: "center",
-        fontSize: 18,
-        fontWeight: "400",
+        fontSize: 16,
+        fontWeight: "300",
         color: "black"
     },
     button: {
@@ -113,12 +131,11 @@ const styles = StyleSheet.create({
         height: 50,
         marginTop: 50,
         borderRadius: 8,
-        backgroundColor: "#ffcc00"
+        backgroundColor: "#E9E9E9"
     },
     buttonText: {
         fontSize: 16,
-      
-       
-        color: '#ffffff',
+        color: 'black',
+        fontWeight : "bold"
     }
 });

@@ -1,5 +1,7 @@
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Linking } from "react-native";
+
 
 export const storageKey  = {
   lastScrappingDate : "lastScrappingDate"
@@ -36,4 +38,13 @@ export function removeSpaceOfString ( str ) {
 export async function openUrl( url ) {
     if (Linking.canOpenURL(url)) return await Linking.openURL(url) ; else throw new Error ("Can't open url " + url );
 }
+export async function setUserCredentials( credential ) {
+
+  return await storage.set("userCredentials", JSON.stringify(credential));
+}
+
+export async function getUserCredentials(){
+  return JSON.parse( await storage.get("userCredentials") ) ;
+}
+
 
