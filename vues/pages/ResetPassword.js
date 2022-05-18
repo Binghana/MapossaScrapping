@@ -22,7 +22,7 @@ const loading = require("../../res/loader.gif");
 
 
 import { sdkAuthError } from "../../contollers/SDK-auth-error";
-import { isPermissionGranted } from "../../contollers/Functions/SMS";
+
 
 
 
@@ -64,34 +64,21 @@ export default class ResetPassword extends React.Component {
     }
 
     async sendResetPasswordEmail() {
-        console.log("Envoyons l'email de rénitialisation de mot de paase")
-        // try {
-        //     this.startAsyncOperation();
+        try {
+            this.startAsyncOperation()
+            console.log("Envoyons l'email de rénitialisation de mot de paase")
 
-        //     const userCredential = await auth().signInWithEmailAndPassword( this.state.email, this.state.password);
+            await auth().sendPasswordResetEmail(this.state.email);
+            this.endAsyncOperation()
+            this.gotToPage("ResetPasswordEmailSend")
+            
+        } catch (error) {
 
+            console.log("Une erreur est survennue lors de l'envoi de l'email de vérification")
+            this.setState({ isThereError: true, error: JSON.stringify({ code: error.code, ...error }) })
+            this.endAsyncOperation()
 
-
-        //     console.log(userCredential);
-        //     const user = userCredential.user;
-        //     // await setUserCredentials(user);
-        //     // console.log("user saved successfully on login")
-
-        //     this.endAsyncOperation()
-        //     //if (!user.emailVerified) return this.gotToPage("ShouldVerifyEmail", { email: this.state.email });
-        //     if (!(await isPermissionGranted())) return this.gotToPage("RequestPermission")
-        //     return this.gotToPage("PluginInstalledSuccessfully");
-
-        // } catch (error) {
-
-        //     console.log(error)
-        //     const errorCode = error.code;
-        //     const errorMessage = error.message;
-        //     console.log(errorMessage)
-        //     this.setState({ isThereError: true, error: JSON.stringify(error) })
-        //     this.endAsyncOperation()
-        // }
-
+        }
 
     }
     startAsyncOperation() {
@@ -152,21 +139,17 @@ export default class ResetPassword extends React.Component {
         return (
             <ScrollView style={styles.main}>
 
-                <View style={styles.espace1}></View>
-                <View >
-                    <Pressable onLongPress={() => { this.goToPageActivation() }}  >
-                        <Image source={logiMapo} style={styles.image} />
 
-                    </Pressable>
-
-                </View>
                 <View style={styles.espace1}></View>
                 <View>
-                    <Text style={styles.pageTitle}>Mot de pase oublié ?</Text>
+                    <Text style={styles.pageTitle}> Mot de passe oublié ? </Text>
                 </View>
-                <Text style={styles.label}>Veuillez saisi l'adresse email utilisé pour créer votre compte utilisateur</Text>
-                <View>
-                    <Text style={styles.label}>Adresse Email</Text>
+               
+                    <Text style={styles.highLabel}>Veuillez saisi l'adresse email utilisé pour créer votre compte utilisateur</Text>
+                
+
+                <View style = {styles.containerMain} >
+                    <Text style={styles.label}>Adresse email</Text>
                     <View style={styles.espace2}></View>
                     <TextInput
                         onChangeText={(email) => {
@@ -201,13 +184,6 @@ export default class ResetPassword extends React.Component {
                         {/* <ActivityIndicator size="large" color="#00ff00" /> */}
                         {this.state.isLoading && <Image source={loading} style={styles.loading}></Image>}
                     </Pressable>
-                    <Pressable onPress={() => {
-                        console.log("Allons créer un compte")
-                        
-                    }}>
-                        <Text style={styles.textLow}> Vous n’avez pas de compte ? </Text>
-                    </Pressable>
-
                     {this.state.isThereError && <Text style={styles.textError}> {this.showErrorInfo()}</Text>}
                 </View>
             </ScrollView>
@@ -216,6 +192,17 @@ export default class ResetPassword extends React.Component {
 
 }
 const styles = StyleSheet.create({
+    containerMain : {
+        marginTop : 50
+    }, 
+    highLabel: {
+        marginTop : 50,
+        fontSize : 18,
+        fontWeight : "600",
+        color : "black",
+        marginHorizontal : 35,
+        textAlign : "center"
+    },
     textLow: {
         marginTop: 10,
         color: "black",
@@ -235,7 +222,7 @@ const styles = StyleSheet.create({
         textDecorationLine: 'underline'
     },
     buttonContainer: {
-        marginTop: 30
+        marginTop : 40
     },
     container: {
         flexDirection: "row",
@@ -262,6 +249,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     label: {
+
         margin: 8,
     },
     main: {
@@ -271,11 +259,12 @@ const styles = StyleSheet.create({
     pageTitle: {
         color: "black",
         textAlign: "center",
-        fontSize: 25,
+        fontSize: 28,
         fontWeight: "bold"
     },
     espace1: {
-        height: 50
+        height: 50,
+        marginTop: 60
     },
     espace2: {
         height: 20
@@ -308,7 +297,9 @@ const styles = StyleSheet.create({
     buttonEnable: {
         alignItems: "center",
         justifyContent: "center",
-        height: 40,
+        height: 48,
+        width : 286,
+        alignSelf : "center",
         marginHorizontal: "5%",
         borderRadius: 8,
         backgroundColor: "#FFCC00"
@@ -321,7 +312,9 @@ const styles = StyleSheet.create({
     buttonDisable: {
         alignItems: "center",
         justifyContent: "center",
-        height: 40,
+        height: 48,
+        width : 286,
+        alignSelf : "center",
         marginHorizontal: "5%",
         borderRadius: 8,
         backgroundColor: "#EDEDED"
@@ -329,7 +322,9 @@ const styles = StyleSheet.create({
     button: {
         alignItems: "center",
         justifyContent: "center",
-        height: 40,
+        height: 48,
+        width : 286,
+        alignSelf : "center",
         marginHorizontal: "5%",
         borderRadius: 8,
         backgroundColor: "#FFCC00"

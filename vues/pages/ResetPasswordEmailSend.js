@@ -15,7 +15,7 @@ export default class ResetPasswordEmailSend extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            email: "example@gmail.com",
+           // email: "example@gmail.com",
             isThereError : false,
             errorMessage : "Une erreur est survennue",
         }
@@ -49,10 +49,10 @@ export default class ResetPasswordEmailSend extends React.Component {
                 <View style={styles.boxCentral}>
 
                     <Text style={styles.title} >Le lien de réinitialisation a été envoyé</Text>
-                    <Text style={styles.email} > {this.state.email} </Text>
+                  
                     <Text style={styles.content} >Consulter votre boite de réception et cliquez sur le lien pour réinitialiser votre mot de passe</Text>
 
-                    <Pressable style={styles.button} onPress={() => { }} >
+                    <Pressable style={styles.button} onPress={() => { this.goToPage("Connection") }} >
                         <Text style={styles.buttonText}>Se connecter</Text>
                     </Pressable>
                     { this.state.isThereError && <Text style = {styles.textError} > {this.state.errorMessage}</Text>}
@@ -72,9 +72,10 @@ const styles = StyleSheet.create({
     title : {
         marginTop : 30,
         color  : "#434343",
-        fontSize : 22,
+        fontSize : 26,
         alignSelf : "center",
-        fontWeight : "600"
+        textAlign : "center",
+        fontWeight : "800"
     },
     image: {
         marginTop : 120,
@@ -115,14 +116,16 @@ const styles = StyleSheet.create({
     button: {
         alignItems: "center",
         justifyContent: "center",
-        height: 50,
+        height: 48,
+        width : 286,
+        alignSelf : "center",
         marginTop: 50,
         borderRadius: 8,
-        backgroundColor: "#E9E9E9"
+        backgroundColor: "#FFCC00"
     },
     buttonText: {
         fontSize: 16,
-        color: 'black',
+        color: 'white',
         fontWeight : "bold"
     }
 });

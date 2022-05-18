@@ -102,21 +102,21 @@ export default class PageInscription extends React.Component {
     try {
       this.startAsyncOperation();
 
-      const userCredential = await auth().createUserWithEmailAndPassword( this.state.email, this.state.password);
+      const userCredential = await auth().createUserWithEmailAndPassword(this.state.email, this.state.password);
 
       console.log(userCredential);
       const user = userCredential.user;
 
-      await setUserCredentials(user);
-      console.log("utilisateur sauvegardés");
+      // await setUserCredentials(user);
+      // console.log("utilisateur sauvegardés");
 
       await this.createUserOnFirestore(user.uid)
       await auth().currentUser.sendEmailVerification();
       console.log("L'email de vérification a été envoyé avec succès")
-      
+
       this.endAsyncOperation()
       this.gotToPage("RequestPermission", { email: this.state.email });
-      
+
     } catch (error) {
       console.log("Une erreur est survennue")
       console.log(error)
@@ -124,7 +124,7 @@ export default class PageInscription extends React.Component {
       console.log(errorCode)
       const errorMessage = error.message;
       console.log(errorMessage)
-      this.setState({ isThereError: true, error: JSON.stringify({code : errorCode ,...error}) })
+      this.setState({ isThereError: true, error: JSON.stringify({ code: errorCode, ...error }) })
       this.endAsyncOperation()
     }
 
@@ -323,7 +323,7 @@ export default class PageInscription extends React.Component {
             console.log("Allons nous connecter")
             this.gotToPage("Connection");
           }}>
-            <Text style={styles.textLow}> Vous avez dejà un compte ? </Text>
+            <Text style={styles.textMedium}> Vous avez dejà un compte ? </Text>
           </Pressable>
           {this.state.isThereError && <Text style={styles.textError}> {this.showErrorInfo()}</Text>}
         </View>
@@ -333,12 +333,19 @@ export default class PageInscription extends React.Component {
 
 }
 const styles = StyleSheet.create({
-  textLow: {
-        marginTop: 10,
-        color: "black",
-        alignSelf: "center",
+  textMedium: {
+    marginTop: 10,
+    color: "black",
+    alignSelf: "center",
+    fontSize : 16
 
-    },
+  },
+  textLow: {
+    marginTop: 10,
+    color: "black",
+    alignSelf: "center",
+
+  },
   textError: {
     color: "red",
     alignSelf: "center",

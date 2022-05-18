@@ -72,7 +72,7 @@ export default class Connection extends React.Component {
     }
 
     enableButton() {
-        let res = this.state.isEmailGood && this.state.isPassWordGood 
+        let res = this.state.isEmailGood && this.state.isPassWordGood
         this.setState({ isButtonDisabled: !res });
     }
 
@@ -80,10 +80,10 @@ export default class Connection extends React.Component {
 
         try {
             this.startAsyncOperation();
-            
-            const userCredential = await auth().signInWithEmailAndPassword( this.state.email, this.state.password);
 
-            
+            const userCredential = await auth().signInWithEmailAndPassword(this.state.email, this.state.password);
+
+
             console.log("User has logged in successfully")
             console.log(userCredential);
             const user = userCredential.user;
@@ -130,9 +130,9 @@ export default class Connection extends React.Component {
         console.log(err.status)
         console.log(err)
         if ("code" in err) {
-            
+
             const errorcode = err.code;
-            if (errorcode == sdkAuthError.INVALID_EMAIL ) return ERROR_INVALID_EMAIL ;
+            if (errorcode == sdkAuthError.INVALID_EMAIL) return ERROR_INVALID_EMAIL;
             if (errorcode == sdkAuthError.NETWORK_REQUEST_FAILED) return ERROR_NO_NETWORK;
             if (errorcode == sdkAuthError.INVALID_PASSWORD) return ERROR_INVALID_PASSWORD;
             if (errorcode == sdkAuthError.USER_DELETED) return ERROR_EMAIL_NOT_REGISTERED;
@@ -197,7 +197,7 @@ export default class Connection extends React.Component {
                         placeholder="Insérez votre adresse email..."
                         placeholderTextColor="#000"
                     />
-                   
+
                 </View>
                 <View style={styles.espace3}></View>
                 <View>
@@ -236,7 +236,13 @@ export default class Connection extends React.Component {
                         {/* <ActivityIndicator size="large" color="#00ff00" /> */}
                         {this.state.isLoading && <Image source={loading} style={styles.loading}></Image>}
                     </Pressable>
-                    <Pressable onPress={()=>{
+                    <Pressable onPress={() => {
+                        console.log("Allons réinitialiser le mot de passe")
+                        this.gotToPage("ResetPassword");
+                    }}>
+                        <Text style={styles.textMedium}> Mot de passe oublié ? </Text>
+                    </Pressable>
+                    <Pressable onPress={() => {
                         console.log("Allons créer un compte")
                         this.gotToPage("Inscription");
                     }}>
@@ -251,8 +257,15 @@ export default class Connection extends React.Component {
 
 }
 const styles = StyleSheet.create({
+    textMedium : {
+        marginTop: 25,
+        color: "black",
+        alignSelf: "center",
+        fontSize : 16,
+        fontWeight : "800"
+    },
     textLow: {
-        marginTop: 10,
+        marginTop: 20,
         color: "black",
         alignSelf: "center",
 
@@ -270,7 +283,7 @@ const styles = StyleSheet.create({
         textDecorationLine: 'underline'
     },
     buttonContainer: {
-        marginTop: 30
+        
     },
     container: {
         flexDirection: "row",
