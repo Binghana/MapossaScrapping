@@ -29,11 +29,11 @@ const App = () => {
         }}
       >
        
-       
+      
         <Stack.Screen name= "SpalshScreen" component = {SpalshScreen} />
         <Stack.Screen name= "Inscription" component = {PageInscription} options={{headerLeft: (props) => null }} />
-        <Stack.Screen name= "Connection" component = {Connection} options={{headerLeft: (props) => null }} />
         
+        <Stack.Screen name= "Connection" component = {Connection} options={{headerLeft: (props) => null }} />
         <Stack.Screen name='RequestPermission' component={RequestPermissionReadSMS} options={{headerLeft: (props) => null }} />
         <Stack.Screen name="AutorisationDenied"  component={AutorisationDenied} options={{headerLeft: (props) => null }} />
         <Stack.Screen name='PluginInstalledSuccessfully' component={ PluginInstalledSuccessfully } options={{headerLeft: (props) => null }} />

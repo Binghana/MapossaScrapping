@@ -84,7 +84,7 @@ export default class Connection extends React.Component {
             const userCredential = await auth().signInWithEmailAndPassword( this.state.email, this.state.password);
 
             
-
+            console.log("User has logged in successfully")
             console.log(userCredential);
             const user = userCredential.user;
             // await setUserCredentials(user);
@@ -197,6 +197,7 @@ export default class Connection extends React.Component {
                         placeholder="Insérez votre adresse email..."
                         placeholderTextColor="#000"
                     />
+                   
                 </View>
                 <View style={styles.espace3}></View>
                 <View>

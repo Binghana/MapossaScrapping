@@ -48,10 +48,11 @@ export default class SpalshScreen extends React.Component {
             console.log("Voici le token pour les notifications")
             console.log(token)
         })
-        messaging().onMessage((message)=>{
-            console.log("On a recu un message")
-            console.log(message)
-        })
+        // messaging().onMessage((message)=>{
+        //     console.log("On a recu un message")
+        //     console.log(message)
+        // })
+        
         auth().onAuthStateChanged(async (user) => {
             console.log("auth state changed")
             console.log(user)
