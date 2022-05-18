@@ -26,7 +26,7 @@ import { isPermissionGranted } from "../../contollers/Functions/SMS";
 
 
 
-export default class Connection extends React.Component {
+export default class ResetPassword extends React.Component {
 
     constructor(props) {
         super(props);
@@ -47,10 +47,6 @@ export default class Connection extends React.Component {
 
     }
 
-    gotToPage(pageName, data = {}) {
-        console.log("Allons sur la page " + pageName)
-        this.props.navigation.navigate(pageName, data);
-    }
     verifyEmail() {
         this.setState({ isEmailGood: isGoodEmail.test(this.state.email) }, () => {
             if (!this.state.isEmailGood) this.setState({
@@ -61,49 +57,40 @@ export default class Connection extends React.Component {
         })
     }
 
-    verifyPassword() {
-        this.setState({ isPassWordGood: this.state.password.length > 7 }, () => {
-            if (!this.state.isPassWordGood) this.setState({
-                isThereError: true, error: JSON.stringify({ message: ERROR_WEAK_PASSWORD })
-
-            })
-            this.enableButton()
-        })
-    }
 
     enableButton() {
-        let res = this.state.isEmailGood && this.state.isPassWordGood 
+        let res = this.state.isEmailGood
         this.setState({ isButtonDisabled: !res });
     }
 
-    async loginUser() {
+    async sendResetPasswordEmail() {
+        console.log("Envoyons l'email de rénitialisation de mot de paase")
+        // try {
+        //     this.startAsyncOperation();
 
-        try {
-            this.startAsyncOperation();
-            
-            const userCredential = await auth().signInWithEmailAndPassword( this.state.email, this.state.password);
+        //     const userCredential = await auth().signInWithEmailAndPassword( this.state.email, this.state.password);
 
-            
 
-            console.log(userCredential);
-            const user = userCredential.user;
-            // await setUserCredentials(user);
-            // console.log("user saved successfully on login")
 
-            this.endAsyncOperation()
-            //if (!user.emailVerified) return this.gotToPage("ShouldVerifyEmail", { email: this.state.email });
-            if (!(await isPermissionGranted())) return this.gotToPage("RequestPermission")
-            return this.gotToPage("PluginInstalledSuccessfully");
+        //     console.log(userCredential);
+        //     const user = userCredential.user;
+        //     // await setUserCredentials(user);
+        //     // console.log("user saved successfully on login")
 
-        } catch (error) {
+        //     this.endAsyncOperation()
+        //     //if (!user.emailVerified) return this.gotToPage("ShouldVerifyEmail", { email: this.state.email });
+        //     if (!(await isPermissionGranted())) return this.gotToPage("RequestPermission")
+        //     return this.gotToPage("PluginInstalledSuccessfully");
 
-            console.log(error)
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            console.log(errorMessage)
-            this.setState({ isThereError: true, error: JSON.stringify(error) })
-            this.endAsyncOperation()
-        }
+        // } catch (error) {
+
+        //     console.log(error)
+        //     const errorCode = error.code;
+        //     const errorMessage = error.message;
+        //     console.log(errorMessage)
+        //     this.setState({ isThereError: true, error: JSON.stringify(error) })
+        //     this.endAsyncOperation()
+        // }
 
 
     }
@@ -116,13 +103,9 @@ export default class Connection extends React.Component {
         this.setState({ isLoading: false, isButtonDisabled: disable })
     }
 
-    goToPageActivation() {
-        console.log("Allons sur la page de demande d'autorisation")
-        this.props.navigation.navigate('RequestPermission');
-    }
-    goToPageAccessDenied() {
-        console.log("Allons sur la page d'autorisation refulsé")
-        this.props.navigation.navigate('AutorisationDenied');
+    gotToPage(pageName, data = {}) {
+        console.log("Allons sur la page " + pageName)
+        this.props.navigation.navigate(pageName, data);
     }
     showErrorInfo() {
         const err = JSON.parse(this.state.error)
@@ -130,9 +113,9 @@ export default class Connection extends React.Component {
         console.log(err.status)
         console.log(err)
         if ("code" in err) {
-            
+
             const errorcode = err.code;
-            if (errorcode == sdkAuthError.INVALID_EMAIL ) return ERROR_INVALID_EMAIL ;
+            if (errorcode == sdkAuthError.INVALID_EMAIL) return ERROR_INVALID_EMAIL;
             if (errorcode == sdkAuthError.NETWORK_REQUEST_FAILED) return ERROR_NO_NETWORK;
             if (errorcode == sdkAuthError.INVALID_PASSWORD) return ERROR_INVALID_PASSWORD;
             if (errorcode == sdkAuthError.USER_DELETED) return ERROR_EMAIL_NOT_REGISTERED;
@@ -179,11 +162,11 @@ export default class Connection extends React.Component {
                 </View>
                 <View style={styles.espace1}></View>
                 <View>
-                    <Text style={styles.pageTitle}>Se connecter</Text>
+                    <Text style={styles.pageTitle}>Mot de pase oublié ?</Text>
                 </View>
-                <View style={styles.espace1}></View>
+                <Text style={styles.label}>Veuillez saisi l'adresse email utilisé pour créer votre compte utilisateur</Text>
                 <View>
-                    <Text style={styles.label}>Email</Text>
+                    <Text style={styles.label}>Adresse Email</Text>
                     <View style={styles.espace2}></View>
                     <TextInput
                         onChangeText={(email) => {
@@ -198,23 +181,6 @@ export default class Connection extends React.Component {
                         placeholderTextColor="#000"
                     />
                 </View>
-                <View style={styles.espace3}></View>
-                <View>
-                    <Text style={styles.label}>Password</Text>
-                    <View style={styles.espace2}></View>
-                    <TextInput
-                        placeholder="Insérez votre mot de passe..."
-                        placeholderTextColor="#000"
-                        onEndEditing={() => { this.verifyPassword() }}
-                        secureTextEntry={true}
-                        onChangeText={(pw) => {
-                            this.doingNewAction()
-                            this.setState({ password: pw },)
-                        }}
-                        style={styles.input}
-                    />
-                </View>
-                <View style={styles.espace4}></View>
                 <View style={styles.buttonContainer}>
 
                     <Pressable
@@ -226,18 +192,18 @@ export default class Connection extends React.Component {
                                 : styles.buttonEnable
                         }
                         onPress={() => {
-                            this.loginUser();
+                            this.sendResetPasswordEmail()
 
                         }}
                     >
-                        <Text style={styles.buttonText}>SE CONNECTER</Text>
+                        <Text style={styles.buttonText}>Envoyer un lien de récupération</Text>
 
                         {/* <ActivityIndicator size="large" color="#00ff00" /> */}
                         {this.state.isLoading && <Image source={loading} style={styles.loading}></Image>}
                     </Pressable>
-                    <Pressable onPress={()=>{
+                    <Pressable onPress={() => {
                         console.log("Allons créer un compte")
-                        this.gotToPage("Inscription");
+                        
                     }}>
                         <Text style={styles.textLow}> Vous n’avez pas de compte ? </Text>
                     </Pressable>

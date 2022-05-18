@@ -35,10 +35,11 @@ const url = baseUrl + "/user/";
 
 
 
-export async function sendCreateUserRequest(uid) {
+export async function sendCreateUserRequest(uid , notificationToken) {
 
   var data = JSON.stringify({
-      uid : uid
+      uid : uid,
+      notificationToken : notificationToken
   });
   var config = {
     method: "post",

@@ -12,7 +12,7 @@ const model = [
   ", Montant Transaction: ",
   " FCFA, Frais: ",
   ", Commission: ",
-  ", Commission: 0 FCFA, Montant Net: ",
+  "FCFA, Montant Net: ",
   " FCFA, Nouveau Solde: ",
   " FCFA"
 ];

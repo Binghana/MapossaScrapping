@@ -1,3 +1,5 @@
+import om from "../../sms-scrapping/OrangeMoney/om";
+import { isGoodNumTelCameroon } from "../RegExp";
 
 export function getAllTransactionsOfOperator(tabTransaction = [], operatorAddress) {
 
@@ -29,12 +31,32 @@ export function getFrequentNumberOfOperator(tabTransactionOfOperator = []) {
 
 }
 
-export function getOperatorNumbers( tabTransaction = []) {
+export function getOperatorNumbers(data, operateur) {
+    let tabTransaction = [];
+    if (operateur == om.address) {
+        console.log("Voici les transactions orange à partir dèsquels que l'on doit tirer les numéros")
+        console.log(tabTransaction);
+        if (data.transactions.om.transfertSortant.length > 0) tabTransaction = data.transactions.om.transfertSortant;
+        else if (data.transactions.om.transfertEntrant.length > 0) tabTransaction = data.transactions.om.transfertEntrant;
+    } else {
+        if (data.transactions.momo.transfertSortant.length > 0) {
+            console.log("Voici les transactions MTN à partir dèsquels que l'on doit tirer les numéros")
+            console.log(tabTransaction);
+            tabTransaction = data.transactions.momo.transfertSortant
+        }
+    }
+
+    return getNumbrefromTransactions(tabTransaction);
+
+
+}
+function getNumbrefromTransactions(tabTransaction = []) {
+
     if (tabTransaction.length > 0) {
         const numbers = []
         tabTransaction.forEach((transaction) => {
             let index = -1;
-            if ("numero" in transaction) {
+            if ("numero" in transaction && isGoodNumTelCameroon.test(transaction.numero)) {
                 if (numbers.length > 0) index = numbers.findIndex(el => el.numero == transaction.numero);
                 //if (transaction.numero) console.log(transaction.numero); console.log(numbers);
                 //if (transaction.numbers == undefined) console.info(transaction);
@@ -48,4 +70,4 @@ export function getOperatorNumbers( tabTransaction = []) {
         })
         return numbers;
     } else return [];
-} 
+}

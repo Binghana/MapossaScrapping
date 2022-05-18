@@ -42,7 +42,7 @@ export function spliedDataInArray(mergedDataWithPub) {
 export function replaceSpaceWithVoid(splitedData) {
   return splitedData.map(data => (data.length <= 1 ? '' : data));
 }
-export function removePub(cleanSplitedData) {
+export function   removePub(cleanSplitedData) {
   let startPub = cleanSplitedData.indexOf('pub');
   cleanSplitedData.splice(startPub, cleanSplitedData.length - startPub);
 }

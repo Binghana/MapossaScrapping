@@ -28,7 +28,9 @@ export default class AutorisationDenied extends React.Component {
                     <Text style={styles.content} >Sans l’accès à vos SMS, nous ne vous serons d’aucune utilité.
                         A bientot</Text>
 
-                    <Pressable style={styles.button} onPress = {this.goToPage("RequestPermission")} >
+                    <Pressable style={styles.button} onPress = {()=>{
+                        this.goToPage("RequestPermission")
+                    }} >
                         <Text style={styles.buttonText}>J'ai Comrpis</Text>
                     </Pressable>
 

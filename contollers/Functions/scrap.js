@@ -101,7 +101,6 @@ export async function scrap(tabSMS = [])  {
       unknowSMS : unknowSMS,
       transactions : transactions,
       isThereData : isThereData
-    
     }
     // console.log("Voici le tableau de sms passé à la fonction de scrap")
     // console.log(tabSMS.length)

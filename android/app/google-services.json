@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "462737693135",
+    "project_id": "mapossadatatech",
+    "storage_bucket": "mapossadatatech.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:462737693135:android:aec66b87f52f5faaa45aba",
+        "android_client_info": {
+          "package_name": "com.binghana.mapossa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "462737693135-fk409v2549c1nqpvgtcrsp1nsd5abh5u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_vfDDSBRZvOv4Gz8pwjHyDml3yV8sG7E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "462737693135-fk409v2549c1nqpvgtcrsp1nsd5abh5u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:462737693135:android:f55631725012010ba45aba",
+        "android_client_info": {
+          "package_name": "com.binghana.mapossascraping"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "462737693135-fk409v2549c1nqpvgtcrsp1nsd5abh5u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_vfDDSBRZvOv4Gz8pwjHyDml3yV8sG7E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "462737693135-fk409v2549c1nqpvgtcrsp1nsd5abh5u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -8,6 +8,7 @@ import { getUserAllCompteFinanciers, sendCreateCompteFinancier } from '../APIReq
 import { bulkCreateTransactions } from '../APIRequest/Transactions';
 import { AppError, mapossaScrappingData } from '../appData';
 import ScrappingError from '../ScrappingError';
+import { getUserCredentials } from '../utilities';
 
 import { getOperatorNumbers } from './scrapingOperation';
 //import { getAllSMS } from './SMS';
@@ -29,10 +30,10 @@ export async function createUsersCompteFinanciers(data) {
     console.log(data.transactions)
 
     console.log("Récuperons le numéros mtn");
-    const numeroMTN = getOperatorNumbers(data.transactions.momo.transfertSortant);
+    const numeroMTN = getOperatorNumbers(data , momo.address);
 
     console.log("Récupérons le numéro ornage")
-    const numeroOrange = getOperatorNumbers(data.transactions.om.transfertSortant);
+    const numeroOrange = getOperatorNumbers(data , om.address);
 
     console.log(numeroMTN); console.log(numeroOrange);
 
@@ -47,8 +48,12 @@ export async function createUsersCompteFinanciers(data) {
         console.log("Envoyons la requête de création du compte financier Orange ");
         await sendCreateCompteFinancier(om.address, numeroOrange[0].numero);
     }
-
-    console.log("on a créer les comptes financiers avec succès")
+    if (numeroMTN.length < 1 && numeroOrange.length < 1) {
+        console.log("Aucun compte financier n'a été crée")
+    }else {
+        console.log("on a créer les comptes financiers avec succès")
+    }
+    
 
 }
 
@@ -101,8 +106,12 @@ export async function createAutoTransaction(data) {
 }
 
 
-export function getIdUser() {
-    return auth.currentUser.uid;
+export async function getIdUser() {
+    if (!auth.currentUser) {
+        return (await getUserCredentials()).uid
+    }else {
+        return auth.currentUser.uid
+    }
 }
 
 export async function verifyVersion() {

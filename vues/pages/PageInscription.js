@@ -12,18 +12,19 @@ import {
 import { urlConditionGeneralUtilisation, urlPolitiqueConfidentialite } from "../../contollers/APIRequest/Const";
 import { sendCreateUserRequest } from "../../contollers/APIRequest/User";
 import { isGoodEmail } from "../../contollers/RegExp.js"
-import { openUrl, removeSpaceOfString } from "../../contollers/utilities";
+import { openUrl, removeSpaceOfString, setUserCredentials } from "../../contollers/utilities";
 
 import { ERROR_CGU_NOT_ACCEPTED, ERROR_EMAIL_ALREADY_USE, ERROR_INVALID_EMAIL, ERROR_INVALID_PASSWORD, ERROR_NO_NETWORK, ERROR_UNKNOW_ERROR, ERROR_WEAK_PASSWORD } from "../../contollers/ErrorMessages";
 
-import { auth } from "../../environment/config";
+import auth from "@react-native-firebase/auth"
+import messaging from '@react-native-firebase/messaging';
 
 const logiMapo = require("../../res/logo_mapossa_scrap.png");
 const loading = require("../../res/loader.gif");
 
 import { browserLocalPersistence, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 import { sdkAuthError } from "../../contollers/SDK-auth-error";
-import { isPermissionGranted } from "../../contollers/Functions/SMS";
+//import { isPermissionGranted } from "../../contollers/Functions/SMS";
 
 
 
@@ -53,18 +54,18 @@ export default class PageInscription extends React.Component {
     //await this.verifyUser()
 
   }
-  async verifyUser() {
-    const user = auth.currentUser
-    if (user) {
+  // async verifyUser() {
+  //   const user = auth.currentUser
+  //   if (user) {
 
-      let permissionsGranted = await isPermissionGranted()
-      if (!permissionsGranted) this.goToPageAccessDenied();
-      if (!user.emailVerified) this.gotToPage("ShouldVerifyEmail");
-      this.gotToPage("PluginInstalledSuccessfully")
+  //     let permissionsGranted = await isPermissionGranted()
+  //     if (!permissionsGranted) this.goToPageAccessDenied();
+  //     if (!user.emailVerified) this.gotToPage("ShouldVerifyEmail");
+  //     this.gotToPage("PluginInstalledSuccessfully")
 
-    }
+  //   }
 
-  }
+  // }
   gotToPage(pageName, data = {}) {
     console.log("Allons sur la page " + pageName)
     this.props.navigation.navigate(pageName, data);
@@ -100,25 +101,30 @@ export default class PageInscription extends React.Component {
 
     try {
       this.startAsyncOperation();
-      await auth.setPersistence(browserLocalPersistence)
-      const userCredential = await createUserWithEmailAndPassword(auth, this.state.email, this.state.password);
+
+      const userCredential = await auth().createUserWithEmailAndPassword( this.state.email, this.state.password);
 
       console.log(userCredential);
       const user = userCredential.user;
 
+      await setUserCredentials(user);
+      console.log("utilisateur sauvegardés");
+
       await this.createUserOnFirestore(user.uid)
-      await sendEmailVerification(user)
+      await auth().currentUser.sendEmailVerification();
       console.log("L'email de vérification a été envoyé avec succès")
+      
       this.endAsyncOperation()
-      this.gotToPage("ShouldVerifyEmail", { email: this.state.email });
+      this.gotToPage("RequestPermission", { email: this.state.email });
       
     } catch (error) {
-
+      console.log("Une erreur est survennue")
       console.log(error)
       const errorCode = error.code;
+      console.log(errorCode)
       const errorMessage = error.message;
       console.log(errorMessage)
-      this.setState({ isThereError: true, error: JSON.stringify(error) })
+      this.setState({ isThereError: true, error: JSON.stringify({code : errorCode ,...error}) })
       this.endAsyncOperation()
     }
 
@@ -133,7 +139,8 @@ export default class PageInscription extends React.Component {
       // const docRef = await setDoc( doc(db,"users",uid), {
       //     idAdalo : idAdalo,
       // });
-      const res = await sendCreateUserRequest(uid);
+      const notificationToken = await messaging().getToken()
+      const res = await sendCreateUserRequest(uid, notificationToken);
       console.log("Document written with ID: ", res.data);
     } catch (e) {
       console.error("Error adding document: ", e);
@@ -307,7 +314,7 @@ export default class PageInscription extends React.Component {
 
             }}
           >
-            <Text style={styles.buttonText}>CRÉER SON COMPTE</Text>
+            <Text style={styles.buttonText}>CRÉER MON COMPTE</Text>
 
             {/* <ActivityIndicator size="large" color="#00ff00" /> */}
             {this.state.isLoading && <Image source={loading} style={styles.loading}></Image>}

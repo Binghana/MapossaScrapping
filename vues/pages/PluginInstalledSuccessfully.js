@@ -4,22 +4,27 @@ import {
     View,
     Text,
     Image,
-    Pressable,
     ScrollView,
 } from "react-native";
 import { imgWorkingAPI } from "../../res/Images"
 import SmsAndroid from "react-native-get-sms-android-v2";
 import { createAutoTransaction, createUsersCompteFinanciers } from "../../contollers/Functions/appManagement";
-import { requestPermissions, filter, isPermissionGranted } from "../../contollers/Functions/SMS";
+import { filter, isPermissionGranted } from "../../contollers/Functions/SMS";
 import ScrappingError from "../../contollers/ScrappingError";
 import { scrap } from "../../contollers/Functions/scrap";
 import { getUserAllCompteFinanciers } from "../../contollers/APIRequest/CompteFinanciers";
 import om from "../../sms-scrapping/OrangeMoney/om";
 import momo from "../../sms-scrapping/MOMO/momo";
-import { storage, storageKey } from "../../contollers/utilities";
+import { getUserCredentials, storage, storageKey } from "../../contollers/utilities";
+import ClientError from "../../contollers/APIRequest/ClientError";
+import auth from "@react-native-firebase/auth"
 export default class PluginInstalledSuccessfully extends React.Component {
     constructor(props) {
         super(props)
+        this.state = {
+            isThereError : false,
+            errorMessage : "Une erreur est suvennue, veuillez nous contacter"
+        }
     }
     async componentDidMount() {
         try {
@@ -38,7 +43,8 @@ export default class PluginInstalledSuccessfully extends React.Component {
                             console.log("on a récupéré" + count)
 
                             const data = await scrap(tabSMS);
-
+                            console.log("On a terminé de traiter les transactions")
+                            console.log(data)
                             await createUsersCompteFinanciers(data);
 
                             await createAutoTransaction(data);
@@ -54,14 +60,17 @@ export default class PluginInstalledSuccessfully extends React.Component {
                             if (error instanceof ScrappingError) {
                                 if (error.code == ScrappingError.ERROR_MORE_THAN_2_NUMBERS) return this.gotToPage("AlertMoreThan2Number");
                                 if (error.code == ScrappingError.ERROR_NO_FINANCIAL_SMS) {
-
-                                    const comptesFinanciers = await getUserAllCompteFinanciers();
+                                    console.log("L'utilisateur n'as pas de sms fianciers")
+                                    const res = await getUserAllCompteFinanciers();
+                                    console.log("on a récupérer les ocmptes de l'utilisateur")
                                     if (res.data.data) {
                                         /**
                                          * @type {Array}
                                          */
+                                        
                                         const comptes = res.data.data;
                                         if (comptes.length > 0) {
+                                            console.log("l'utilisateur a des comptes")
                                             const OMEInfo = await this.getOMEfinancialInformations(comptes);
                                             this.gotToPage("PreviewOfResult", OMEInfo);
                                         } else {
@@ -74,16 +83,25 @@ export default class PluginInstalledSuccessfully extends React.Component {
                                 }
                             }
                         }
-
-
                     },
                 );
             } else {
                 this.gotToPage("AutorisationDenied")
             }
         } catch (error) {
-
+            console.log("Une erreur est survennue avec les permissions")
+            console.log (error)
+            let user ;
+            if (auth().currentUser) user = auth().currentUser; else user = await getUserCredentials();
+            let unkowError = new ClientError(user,error , " " , " on componenet did mount" , "Maybe looking at permissions" ,  "PluginInstalledSuccessfully")
+            await unkowError.save()
+            this.showError();
         }
+
+    }
+    showError( message = "Une erreur est suvennue, veuillez nous contacter" ) {
+
+        this.setState({isThereError : true , errorMessage : message})
     }
     async getOMEfinancialInformations(data) {
         if (!data) {
@@ -143,7 +161,8 @@ export default class PluginInstalledSuccessfully extends React.Component {
 
                     <Image style={styles.appLogo} source={imgWorkingAPI} />
 
-                    <Text style={styles.title} >Plugin installé avec succès</Text>
+                    {  !this.state.isThereError  && <Text style={styles.title} >Plugin installé avec succès</Text>}
+                    { this.state.isThereError && <Text style={styles.textError} > {this.state.errorMessage} </Text>}
                     {/* <Text style={styles.content} >Sans l’accès à vos SMS, nous ne vous serons d’aucune utilité.
                         A bientot</Text>
 
@@ -180,6 +199,13 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         height: 145,
         width: 145,
+    },
+    title: {
+        textAlign: "center",
+        fontSize: 20,
+        fontWeight: "bold",
+        color: "red",
+        marginTop: 100
     },
     title: {
         textAlign: "center",

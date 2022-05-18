@@ -6,9 +6,9 @@ import { getIdUser } from "../Functions/appManagement";
 import { baseUrl } from "./Const";
 
 
-function getUrl() {
+async function getUrl() {
 
-  return baseUrl + "/user/" + getIdUser() + "/compteFinanciers/";
+  return baseUrl + "/user/" + await getIdUser() + "/compteFinanciers/";
 
 }
 
@@ -36,7 +36,7 @@ export async function sendCreateCompteFinancier(operateur, numero) {
 
   var config = {
     method: 'post',
-    url: getUrl(),
+    url: await getUrl(),
     headers: {
       'Content-Type': 'application/json'
     },
@@ -54,13 +54,11 @@ export async function sendCreateCompteFinancier(operateur, numero) {
 }
 export async function getUserAllCompteFinanciers() {
 
-
   var config = {
     method: 'get',
-    url: getUrl(),
+    url: await getUrl(),
     headers: {}
   };
 
   return axios(config);
-
 }
