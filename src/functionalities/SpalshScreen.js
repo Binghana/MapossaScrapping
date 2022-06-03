@@ -14,6 +14,8 @@ import { splashScreenLogo } from "../tools/ressources/Images";
 import auth from "@react-native-firebase/auth"
 
 import messaging from '@react-native-firebase/messaging';
+import { createFile } from "../tools/fileSystem/fs";
+import { checkStorage, initFile } from "../tools/firebaseStorage";
 
 export default class SpalshScreen extends React.Component {
     constructor(props) {
@@ -26,6 +28,11 @@ export default class SpalshScreen extends React.Component {
         }
     }
     async componentDidMount() {
+
+       
+
+        await initFile()
+ 
         await this.initApp()
     }
     async initApp() {

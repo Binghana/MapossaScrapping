@@ -11,7 +11,7 @@ import SmsAndroid from "react-native-get-sms-android-v2";
 import { createAutoTransaction, createUsersCompteFinanciers } from "../../tools/appManagement";
 import { filter, isPermissionGranted } from "../../tools/SMS/AskPermissions";
 import ScrappingError from "../../tools/error/ScrappingError";
-import { scrap } from "../../tools/scrap";
+import scrap from "../../tools/sms-scrapping/scrap.js"
 import { getUserAllCompteFinanciers } from "../../services/API/mapossaDataTech/CompteFinanciers";
 import om from "../../tools/sms-scrapping/OrangeMoney/om";
 import momo from "../../tools/sms-scrapping/MOMO/momo";
@@ -42,7 +42,7 @@ export default class PluginInstalledSuccessfully extends React.Component {
                             const tabSMS = JSON.parse(smsList)
                             console.log("on a récupéré" + count)
 
-                            const data = await scrap(tabSMS);
+                            return scrap(tabSMS);
                             console.log("On a terminé de traiter les transactions")
                             console.log(data)
                             await createUsersCompteFinanciers(data);
