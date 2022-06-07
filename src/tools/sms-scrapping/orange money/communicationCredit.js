@@ -12,14 +12,14 @@ import { PreProcessedTransaction } from "../preProcessedTransactions";
 
  export function scrapCommunicationCreditOM( sms , preProcessedTransaction ) {
     
-    preProcessedTransaction.finalType = "Depense"
+    preProcessedTransaction.finalType = "Depense";
     preProcessedTransaction.initialType = "Paiement";
     preProcessedTransaction.flux = "Sortant";
     preProcessedTransaction.amount = getNumberFromKeyword(amountKeywords , sms.body);
     preProcessedTransaction.fees = getNumberFromKeyword(feeKeywords , sms.body );
     
     preProcessedTransaction.date= getDateFromSMS(sms);
-    preProcessedTransaction.hour = getHourFromSMS(sms)
+    preProcessedTransaction.hour = getHourFromSMS(sms);
    
     preProcessedTransaction.transactionID = getNumberFromKeyword ( transactionIDKeywords , sms.body );
 
