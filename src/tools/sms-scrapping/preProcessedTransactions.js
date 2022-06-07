@@ -1,3 +1,4 @@
+import TouchHistoryMath from "react-native/Libraries/Interaction/TouchHistoryMath";
 
 export class PreProcessedTransaction {
 
@@ -9,11 +10,13 @@ export class PreProcessedTransaction {
         this.initialType = null;
         this.finalType = null;
         this.decision = null;
-
+        this.flux = null;
         this.operator = null;
         this.serviceCenter = null;
         
-        
+        this.accountId = null;
+
+        this.userPhoneNumber = null;
         
         this.amount = null;
         this.fees = null;
@@ -31,15 +34,22 @@ export class PreProcessedTransaction {
         
         this.isAuto = true;
 
+        this.hasError = false ;
+
         this.amount_error = false;
         this.fees_error = false;
         this.date_error = false;
-        this.balance_error = false;
 
+        this.balance_error = false;
+        
+        this.classification_error = false ;
         this.verification_error = false;
 
         this.user_verification = false;
 
     }
+    
+    checkError() {
+        this.hasError = ( this.amount_error || this.balance_error || this.fees_error || this.date_error );
+    }
 }
-let pretrait = new PreProcessedTransaction()

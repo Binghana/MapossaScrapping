@@ -11,8 +11,9 @@ import {
 import { sendCreateCompteFinancier } from "../../services/API/mapossaDataTech/CompteFinanciers";
 import { isGoodNumtelMTNCameroon, isGoodNumtelOrangeCameroon } from "../../tools/verification/RegExp";
 import { imgSorry, logoOrange, logoMTN } from "../../tools/ressources/Images"
-import momo from "../../tools/sms-scrapping/MOMO/momo";
-import om from "../../tools/sms-scrapping/OrangeMoney/om";
+import { operators } from "../../tools/sms-scrapping/operators";
+
+
 
 const loading = require("../../ressources/images/loader.gif");
 export default class NoFinancialSMS extends React.Component {
@@ -62,12 +63,12 @@ export default class NoFinancialSMS extends React.Component {
     }
     verifyNumber(operator) {
         if (!operator) return (this.verifyNumber(om.address) || this.verifyNumber(momo.address) );
-        if (operator == om.address) {
+        if (operator == operators[0].address) {
             const isGood = isGoodNumtelOrangeCameroon.test(this.state.orangeNumber);
             this.setState({ isNumTelOragneCorrect: isGood })
             return isGood;
         }
-        if (operator == momo.address) {
+        if (operator == operators[1].address) {
             const isGood = isGoodNumtelMTNCameroon.test(this.state.mtnNumber);
             this.setState({ isNumTelMTNCorrect: isGood })
             return isGood;

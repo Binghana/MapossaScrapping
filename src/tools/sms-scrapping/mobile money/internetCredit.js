@@ -1,5 +1,6 @@
 import {amountKeywords ,feeKeywords,transactionIDKeywords  }  from "../keywords"
 import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword } from "../functions";
+import { PreProcessedTransaction } from "../preProcessedTransactions";
 /**
  * Transforme un sms identifé comme étant un Acaht de crédit internet de Mobile Money
  * En une transaction prétraitée de Mapossa
@@ -10,7 +11,8 @@ import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword } from "../funct
  */
 
  export function scrapInternetCreditMOMO( sms , preProcessedTransaction ) {
-
+    preProcessedTransaction.initialType = "Paiement";
+    preProcessedTransaction.flux = "Sortant";
     preProcessedTransaction.amount = getNumberFromKeyword(amountKeywords , sms.body);
     preProcessedTransaction.fees = getNumberFromKeyword(feeKeywords , sms.body );
 
@@ -22,6 +24,7 @@ import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword } from "../funct
     preProcessedTransaction.amount_error = ( preProcessedTransaction.amount == -1);
     preProcessedTransaction.fees_error = (preProcessedTransaction.fees == -1);
 
+    preProcessedTransaction.checkError();
 
     return preProcessedTransaction;
 }

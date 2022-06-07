@@ -14,7 +14,7 @@ export const operators = [
     {
         name : "Orange Money",
         address: "OrangeMoney",
-        serviceCenter: ["+23769990009"],
+        serviceCenter: ["+23769990009","+237694000040","+237694000018"],
         typeInitial : {
             retrait:{
                 modelFR : modelOMRetrait,
@@ -49,7 +49,7 @@ export const operators = [
     {
         name : "Mobile Money",
         address: "MobileMoney",
-        serviceCenter: ["+23767770077"],
+        serviceCenter: ["+23767770077","+237671780094","+237679000001"],
         typeInitial : {
             retrait:{
                 modelFR : modelMOMORetrait ,

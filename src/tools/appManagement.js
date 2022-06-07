@@ -1,7 +1,7 @@
+import auth from "@react-native-firebase/auth"
 
-import { auth } from '../../config';
-import momo from './sms-scrapping/MOMO/momo';
-import om from './sms-scrapping/OrangeMoney/om';
+
+
 import { getCurrentAppData } from '../services/API/mapossaDataTech/appData';
 //import storage from '../../storage';
 import { getUserAllCompteFinanciers, sendCreateCompteFinancier } from '../services/API/mapossaDataTech/CompteFinanciers';
@@ -11,8 +11,10 @@ import ScrappingError from './error/ScrappingError';
 import { getUserCredentials } from './utilities';
 
 import { getOperatorNumbers } from './scrapingOperation';
+import { operators } from './sms-scrapping/operators';
 //import { getAllSMS } from './SMS';
-
+const momo = operators[1];
+const om = operators[0];
 
 // export async function getIdUser () {
 //     return await storage.get("idUser");
@@ -107,11 +109,15 @@ export async function createAutoTransaction(data) {
 
 
 export async function getIdUser() {
-    if (!auth.currentUser) {
-        return (await getUserCredentials()).uid
-    }else {
-        return auth.currentUser.uid
+
+   
+    if (!auth().currentUser) {
+        console.log( "on a o pas actuelemnet d'utilisateur")
+
     }
+    
+    return auth().currentUser.uid
+    
 }
 
 export async function verifyVersion() {

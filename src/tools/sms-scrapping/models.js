@@ -1,13 +1,13 @@
-export function matchModel(model, sms) {
+export function matchModel(model, smsBody) {
     let match = true;
     if (model.length > 0) {
       model.map(pth => {
-        match &= sms.includes(pth)
+        match &= smsBody.includes(pth)
       });
     }
     return match;
   }
-  
+
 export const modelMOMOPaiementCreditCommunication = [
     "Votre paiement de ",
     " FCFA pour MTNC AIRTIME a ete effectue le ",

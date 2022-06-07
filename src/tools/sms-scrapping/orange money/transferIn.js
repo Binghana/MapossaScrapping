@@ -1,5 +1,6 @@
 import {amountKeywords ,feeKeywords,transactionIDKeywords , balanceKeywords , senderUserNameKeywords , senderPhoneNumberKeywords }  from "../keywords"
 import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword ,  getUserName } from "../functions";
+import { PreProcessedTransaction } from "../preProcessedTransactions";
 /**
  * Transforme un sms identifé comme étant un transfert entrant d'Orange Money
  * En une transaction prétraitée de Mapossa
@@ -10,7 +11,8 @@ import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword ,  getUserName }
  */
 
  export function scrapTransfertInOM( sms , preProcessedTransaction ) {
-
+    preProcessedTransaction.initialType = "Transfert"
+    preProcessedTransaction.flux = "Entrant"
     preProcessedTransaction.amount = getNumberFromKeyword(amountKeywords , sms.body);
     preProcessedTransaction.fees = getNumberFromKeyword(feeKeywords , sms.body );
     preProcessedTransaction.date= getDateFromSMS(sms);
@@ -24,6 +26,6 @@ import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword ,  getUserName }
     preProcessedTransaction.amount_error = ( preProcessedTransaction.amount == -1);
     preProcessedTransaction.fees_error = (preProcessedTransaction.fees == -1);
     preProcessedTransaction.balance_error = (preProcessedTransaction.balance == -1);
-
+    preProcessedTransaction.checkError();
     return preProcessedTransaction;
 }

@@ -13,9 +13,9 @@ import { isPermissionGranted } from "../tools/SMS/AskPermissions";
 import { splashScreenLogo } from "../tools/ressources/Images";
 import auth from "@react-native-firebase/auth"
 
-import messaging from '@react-native-firebase/messaging';
-import { createFile } from "../tools/fileSystem/fs";
-import { checkStorage, initFile } from "../tools/firebaseStorage";
+// import messaging from '@react-native-firebase/messaging';
+// import { createFile } from "../tools/fileSystem/fs";
+// import { checkStorage, initFile } from "../tools/firebaseStorage";
 
 export default class SpalshScreen extends React.Component {
     constructor(props) {
@@ -31,7 +31,7 @@ export default class SpalshScreen extends React.Component {
 
        
 
-        await initFile()
+        //await initFile()
  
         await this.initApp()
     }
@@ -51,10 +51,10 @@ export default class SpalshScreen extends React.Component {
         await this.verifyUser()
     }
     async verifyUser() {
-        messaging().getToken().then((token)=> {
-            console.log("Voici le token pour les notifications")
-            console.log(token)
-        })
+        // messaging().getToken().then((token)=> {
+        //     console.log("Voici le token pour les notifications")
+        //     console.log(token)
+        // })
         // messaging().onMessage((message)=>{
         //     console.log("On a recu un message")
         //     console.log(message)
@@ -75,7 +75,7 @@ export default class SpalshScreen extends React.Component {
                 return this.goToPage("PluginInstalledSuccessfully")
 
             } else {
-                console.log("There is no user Cred")
+                console.log("There is no user")
                 return this.goToPage("Inscription")
 
             }

@@ -17,10 +17,10 @@ export function getNumberFromKeyword(keywords, sms) {
     for (const keyword of keywords) {
         if (sms.includes(keyword)) {
             let position = sms.indexOf(keyword);
-            console.log("Voici la position du mot clé " + keyword + " : " + position.toString())
+            //// console.log("Voici la position du mot clé " + keyword + " : " + position.toString())
             let splitedSms = sms.substring(position);
-            console.log("Voici la partie qui suit le mot clé : ");
-            console.log(splitedSms);
+            //// console.log("Voici la partie qui suit le mot clé : ");
+            //// console.log(splitedSms);
 
 
             let allNumbers = splitedSms.match(montantWithDecimal);
@@ -64,25 +64,25 @@ export function getDateFromSMS(sms) {
 export function getUserName(keywords, sms) {
     for (const keyword of keywords) {
         if (!("start" in keyword && "end" in keyword)) {
-            console.log("Le mot clé donné n'a pas de début ou de fin");
+            // console.log("Le mot clé donné n'a pas de début ou de fin");
 
         } else {
             
             if (sms.includes(keyword.start) && sms.includes(keyword.end)) {
 
                 let positionStart = sms.indexOf(keyword.start) + keyword.start.length;
-                console.log("Voici la position du mot clé de début " + keyword.start + " : " + positionStart.toString())
+                // console.log("Voici la position du mot clé de début " + keyword.start + " : " + positionStart.toString())
                 let positionEnd = sms.indexOf(keyword.end);
                
-                console.log("Voici la position du mot clé de fin " + keyword.end + " : " + positionEnd.toString())
+                // console.log("Voici la position du mot clé de fin " + keyword.end + " : " + positionEnd.toString())
                 let splitedSms = sms.substring( positionStart,positionEnd);
-                console.log("Voici la partie entre les 2 mots clefs ");
-                console.log(splitedSms);
+                // console.log("Voici la partie entre les 2 mots clefs ");
+                // console.log(splitedSms);
 
 
                 let allMatches = splitedSms.match(alpa);
-                console.log("On a des match")
-                console.log(allMatches)
+                // console.log("On a des match")
+                // console.log(allMatches)
                 let whatWeWant = ""
                 for (const name of allMatches) {
                     whatWeWant += ` ${name}`
@@ -110,15 +110,15 @@ export function getUserName(keywords, sms) {
     for (const keyword of keywords) {
         if (sms.includes(keyword)) {
             let position = sms.indexOf(keyword);
-            console.log("Voici la position du mot clé " + keyword + " : " + position.toString())
+            // console.log("Voici la position du mot clé " + keyword + " : " + position.toString())
             let splitedSms = sms.substring(position);
-            console.log("Voici la partie qui suit le mot clé : ");
-            console.log(splitedSms);
+            // console.log("Voici la partie qui suit le mot clé : ");
+            // console.log(splitedSms);
 
 
             let allMatches = splitedSms.match(alphaIdNumber);
-            console.log("On a des match")
-            console.log(allMatches)
+            // console.log("On a des match")
+            // console.log(allMatches)
             let whatWeWant = allMatches[0]
             return whatWeWant;
         }

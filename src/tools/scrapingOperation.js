@@ -1,6 +1,9 @@
-import om from "./sms-scrapping/OrangeMoney/om";
+
+import { operators } from "./sms-scrapping/operators";
+import { PreProcessedTransaction } from "./sms-scrapping/preProcessedTransactions";
 import { isGoodNumTelCameroon } from "./verification/RegExp";
 
+const om = operators[0];
 export function getAllTransactionsOfOperator(tabTransaction = [], operatorAddress) {
 
     return tabTransaction.filter(transac => transac.operateur == operatorAddress);
@@ -50,24 +53,17 @@ export function getOperatorNumbers(data, operateur) {
 
 
 }
-function getNumbrefromTransactions(tabTransaction = []) {
+/**
+ * 
+ * @param {PreProcessedTransaction[]} tabTransaction 
+ * @returns 
+ */
+export function getNumbrefromTransactions(tabTransaction = []) {
 
-    if (tabTransaction.length > 0) {
-        const numbers = []
-        tabTransaction.forEach((transaction) => {
-            let index = -1;
-            if ("numero" in transaction && isGoodNumTelCameroon.test(transaction.numero)) {
-                if (numbers.length > 0) index = numbers.findIndex(el => el.numero == transaction.numero);
-                //if (transaction.numero) console.log(transaction.numero); console.log(numbers);
-                //if (transaction.numbers == undefined) console.info(transaction);
-                if (index < 0) {
-                    numbers.push({ numero: transaction.numero, occurence: 1 });
-                } else {
-                    numbers[index].occurence += 1;
-                }
-            }
 
-        })
-        return numbers;
-    } else return [];
+    let numbers = tabTransaction.map(el => el.userPhoneNumber);
+    numbers = numbers.filter(el => el != null);
+
+    return [...new Set(numbers)];
+
 }

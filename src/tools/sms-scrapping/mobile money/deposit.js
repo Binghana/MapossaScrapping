@@ -1,5 +1,6 @@
 import {amountKeywords ,feeKeywords,transactionIDKeywords , balanceKeywords , senderUserNameKeywords , senderPhoneNumberKeywords }  from "../keywords"
 import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword  , getUserName } from "../functions";
+import { PreProcessedTransaction } from "../preProcessedTransactions";
 /**
  * Transforme un sms identifé comme étant un dépot de Mobile Money
  * En une transaction prétraitée de Mapossa
@@ -11,7 +12,8 @@ import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword  , getUserName }
 
 export function scrapDepositMoMo( sms , preProcessedTransaction ) {
 
-
+    preProcessedTransaction.initialType = "Depot";
+    preProcessedTransaction.flux = "Entrant";
     preProcessedTransaction.amount = getNumberFromKeyword(amountKeywords , sms.body);
     preProcessedTransaction.fees = getNumberFromKeyword(feeKeywords , sms.body );
     preProcessedTransaction.date= getDateFromSMS(sms);
@@ -26,5 +28,6 @@ export function scrapDepositMoMo( sms , preProcessedTransaction ) {
     preProcessedTransaction.fees_error = (preProcessedTransaction.fees == -1);
     preProcessedTransaction.balance_error = (preProcessedTransaction.balance == -1);
 
+    preProcessedTransaction.checkError();
     return preProcessedTransaction;
 }

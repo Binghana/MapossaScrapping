@@ -6,7 +6,7 @@ import { baseUrl } from "./Const";
 
 function getUrl() {
 
-    return baseUrl + "/user/" + getIdUser() + "/transactions/";
+    return baseUrl + "/user/" + getIdUser() + "/transactions";
   
   }
 
@@ -26,5 +26,22 @@ export async function bulkCreateTransactions( transactions = []) {
       };
       
       return axios(config)   
+}
+export async function bulkCreateUnknowTransactions( transactions = []) {
+
+  var data = JSON.stringify({
+      "transactions": transactions
+    });
+    
+    var config = {
+      method: 'post',
+      url: getUrl() + "/?source=scraping",
+      headers: { 
+        'Content-Type': 'application/json'
+      },
+      data : data
+    };
+    
+    return axios(config)   
 }
 
