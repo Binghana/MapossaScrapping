@@ -27,7 +27,7 @@ import { PreProcessedTransaction } from "../preProcessedTransactions";
     preProcessedTransaction.receiverName = getUserName ( receiverUserNameKeywords , sms.body );
     preProcessedTransaction.receiverPhoneNumber = getNumberFromKeyword ( receiverPhoneNumberKeywords , sms.body );
 
-    preProcessedTransaction.userPhoneNumber = preProcessedTransaction.receiverPhoneNumber;
+    preProcessedTransaction.userPhoneNumber = (isGoodNumTelCameroon.test(preProcessedTransaction.receiverPhoneNumber)) ? preProcessedTransaction.receiverPhoneNumber : null;
     
     preProcessedTransaction.amount_error = ( preProcessedTransaction.amount == -1);
     preProcessedTransaction.fees_error = (preProcessedTransaction.fees == -1);

@@ -1,6 +1,6 @@
 import { PermissionsAndroid } from "react-native";
 
-export let nbJoursEnArrire = 90;
+//export let nbJoursEnArrire = 360;
 
 export const filter = {
   //box: 'inbox', // 'inbox' (default), 'sent', 'draft', 'outbox', 'failed', 'queued', and '' for all
@@ -14,7 +14,7 @@ export const filter = {
    *    - Same for minDate but with "date >= minDate"
    */
   
-  minDate: (new Date().getTime() -nbJoursEnArrire*24*3600*1000), // timestamp (in milliseconds since UNIX epoch)
+  //minDate: (new Date().getTime() -nbJoursEnArrire*24*3600*1000), // timestamp (in milliseconds since UNIX epoch)
   maxDate: new Date().getTime(), // timestamp (in milliseconds since UNIX epoch)
   /*bodyRegex: '(.*)How are you(.*)', // content regex to match
   */
@@ -35,11 +35,9 @@ export async function requestPermissions() {
     let granted = {};
     try {
       console.log("requesting SMS permissions");
-      granted = await PermissionsAndroid.requestMultiple(
-        [
+      granted = await PermissionsAndroid.request(
+        
           PermissionsAndroid.PERMISSIONS.READ_SMS,
-          PermissionsAndroid.PERMISSIONS.SEND_SMS
-        ],
         {
           title: "Example App SMS Features",
           message: "Example SMS App needs access to demonstrate SMS features",
@@ -48,7 +46,13 @@ export async function requestPermissions() {
           buttonPositive: "OK"
         }
       );
-      console.log(granted);
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log("You can use the SMS");
+        return true;
+      } else {
+        console.log("Camera permission denied");
+        return false;
+      }
     //   console.log(PermissionsAndroid.RESULTS.GRANTED)
     //   if (granted === PermissionsAndroid.RESULTS.GRANTED) {
     //     console.log("You can use SMS features");

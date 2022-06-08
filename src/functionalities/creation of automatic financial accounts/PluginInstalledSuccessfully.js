@@ -22,8 +22,9 @@ import { operators } from "../../tools/sms-scrapping/operators";
 import { getNumbrefromTransactions } from "../../tools/scrapingOperation";
 import { PreProcessedTransaction } from "../../tools/sms-scrapping/preProcessedTransactions";
 import { bulkCreateTransactions, bulkCreateUnknowTransactions } from "../../services/API/mapossaDataTech/Transactions";
+import { ERROR_NO_NETWORK } from "../../tools/error/ErrorMessages";
 
-
+const loading = require("../../ressources/images/loader.gif");
 export default class PluginInstalledSuccessfully extends React.Component {
     constructor(props) {
         super(props)
@@ -36,69 +37,74 @@ export default class PluginInstalledSuccessfully extends React.Component {
         try {
 
             console.log("Nous sommes arrivés sur la page de succès d'installation du plugin")
-            if (await isPermissionGranted()) {
-                console.log("Récuperons les sms de l'utilisateur")
-                return SmsAndroid.list(
-                    JSON.stringify(filter),
-                    fail => {
-                        throw fail;
-                    },
-                    async (count, smsList) => {
-                        try {
-                            const tabSMS = JSON.parse(smsList)
-                            console.log("on a récupéré" + count)
 
-                            const results = scrap(tabSMS);
-                            
-                            // console.log("On a terminé de traiter les transactions")
-                            // console.log(data)
-                            // await createUsersCompteFinanciers(data);
+            console.log("Récuperons les sms de l'utilisateur")
+            const permiGanted = await isPermissionGranted()
+            if (!permiGanted) {
+                return this.gotToPage("RequestPermission")
+            }
+            
+            return SmsAndroid.list(
+                JSON.stringify(filter),
+                fail => {
+                    throw fail;
+                },
+                async (count, smsList) => {
+                    try {
+                        const tabSMS = JSON.parse(smsList)
+                        console.log("on a récupéré " + count)
 
-                            // await createAutoTransaction(data);
-                            // await storage.set(storageKey.lastScrappingDate, new Date().getTime().toString())
-                            
-                            const OMEInfo = await this.getOMEfinancialInformations( results.preProcessedTransaction );
-                            await this.saveUnkown(results.unknownPreProcessedTransactions);
+                        const results = scrap(tabSMS);
+                        //await this.saveUnkown(results.unknownPreProcessedTransactions);
+                        if (results.preProcessedTransaction.length < 1) throw new ScrappingError(ScrappingError.ERROR_NO_FINANCIAL_SMS);
+                        const OMEInfo = await this.getOMEfinancialInformations(results.preProcessedTransaction);
 
-                            
 
-                            this.gotToPage("PreviewOfResult", OMEInfo);
 
-                        } catch (error) {
-                            console.log("on a throw l'erreur au niveau de plugin install succ ")
-                            console.log(error);
-                            if (error.message == "Network Error") console.log("erreur pas de connection")
-                            if (error instanceof ScrappingError) {
-                                if (error.code == ScrappingError.ERROR_MORE_THAN_2_NUMBERS) return this.gotToPage("AlertMoreThan2Number");
-                                if (error.code == ScrappingError.ERROR_NO_FINANCIAL_SMS) {
-                                    console.log("L'utilisateur n'as pas de sms fianciers")
-                                    const res = await getUserAllCompteFinanciers();
-                                    console.log("on a récupérer les ocmptes de l'utilisateur")
-                                    if (res.data.data) {
-                                        /**
-                                         * @type {Array}
-                                         */
 
-                                        const comptes = res.data.data;
-                                        if (comptes.length > 0) {
-                                            console.log("l'utilisateur a des comptes")
-                                            const OMEInfo = await this.getOMEfinancialInformations(comptes);
-                                            this.gotToPage("PreviewOfResult", OMEInfo);
-                                        } else {
-                                            this.gotToPage("NoFinancialSMS");
-                                        }
+
+                        this.gotToPage("PreviewOfResult", OMEInfo);
+
+                    } catch (error) {
+                        console.log("on a throw l'erreur au niveau de plugin install succ ")
+                        console.log(error)
+                        console.log(JSON.stringify(error));
+                        if (error.message == "Network Error") {
+                            console.log("Erreur pas de connection");
+                            this.setState({ isThereError: true, errorMessage: ERROR_NO_NETWORK })
+                        }
+                        if (error.status && error.status == 401) {
+                            console.log(error.data)
+                        }
+                        if (error instanceof ScrappingError) {
+                            if (error.code == ScrappingError.ERROR_MORE_THAN_2_NUMBERS) return this.gotToPage("AlertMoreThan2Number");
+                            if (error.code == ScrappingError.ERROR_NO_FINANCIAL_SMS) {
+                                console.log("L'utilisateur n'as pas de sms fianciers")
+                                const res = await getUserAllCompteFinanciers();
+                                console.log("on a récupérer les ocmptes de l'utilisateur")
+                                if (res.data.data) {
+                                    /**
+                                     * @type {Array}
+                                     */
+
+                                    const comptes = res.data.data;
+                                    if (comptes.length > 0) {
+                                        console.log("l'utilisateur a des comptes")
+                                        const OMEInfo = await this.getOMEfinancialInformations(comptes);
+                                        this.gotToPage("PreviewOfResult", OMEInfo);
                                     } else {
                                         this.gotToPage("NoFinancialSMS");
                                     }
-
+                                } else {
+                                    this.gotToPage("NoFinancialSMS");
                                 }
+
                             }
                         }
-                    },
-                );
-            } else {
-                this.gotToPage("AutorisationDenied")
-            }
+                    }
+                },
+            );
+
         } catch (error) {
             console.log("Une erreur est survennue avec les permissions")
             console.log(error)
@@ -118,8 +124,14 @@ export default class PluginInstalledSuccessfully extends React.Component {
      * 
      * @param {PreProcessedTransaction[]} data 
      */
-    async saveUnkown( data ){
-        await bulkCreateUnknowTransactions(data);
+    async saveUnkown(data) {
+        console.log("Nombre de transactions inconnues : " + data.length)
+        if (data.length > 0) {
+            console.log("Envoyons la requete de création des transactions inconnues")
+            const res = await bulkCreateUnknowTransactions(data);
+            console.log(res.data)
+        }
+
     }
     /**
      * 
@@ -127,146 +139,51 @@ export default class PluginInstalledSuccessfully extends React.Component {
      * @returns 
      */
     async getOMEfinancialInformations(data) {
-        
-        // if (!data) {
-        //     const res = await getUserAllCompteFinanciers();
-        //     if (res.data.data) {
-        //         /**
-        //          * @type {Array}
-        //          */
-        //         const comptes = res.data.data;
-        //         const compteOrange = comptes.find(c => c.nomOperateur == operators[0].address);
-        //         const compteMTN = comptes.find(c => c.nomOperateur == operators[1].address);
-        //         console.log(compteOrange);
-        //         console.log(compteMTN)
-        //         console.log("on a bien récupéreé les informations des OME");
-
-        //         const OMEInfo = {
-        //             orangeNumber: (compteOrange) ? compteOrange.numero : "-",
-        //             orangeSommeEntree: (compteOrange) ? compteOrange.sommeEntree : 0,
-        //             orangeSommeSortie: (compteOrange) ? compteOrange.sommeSortie : 0,
-        //             mtnNumber: (compteMTN) ? compteMTN.numero : "-",
-        //             mtnSommeEntree: (compteMTN) ? compteMTN.sommeEntree : 0,
-        //             mtnSommeSortie: (compteMTN) ? compteMTN.sommeSortie : 0,
-        //         }
-        //         return OMEInfo;
-        //     }
-        // }else {
-        // const comptes = data;
-        // const compteOrange = comptes.find(c => c.operator == operators[0].address);
-        // const compteMTN = comptes.find(c => c.operator == operators[1].address);
-        // console.log(compteOrange);
-        // console.log(compteMTN)
-        // console.log("on a bien récupéreé les informations des OME");
+        //try {
         console.log("Trions les transactions ")
 
-       
-        const transactionsOM = data.filter (  t => (t.operator == operators[0].address));
-
-        const transactionsMOMO = data.filter (  t => ( t.operator == operators[1].address));
-
-        // let response = await sendCreateCompteFinancier("", "", "Espece");
-        // console.log(response.data)
-        // console.log("On a correctement créer le compte Espèce ")
-        const numbersMTN = getNumbrefromTransactions(transactionsMOMO);
-        console.log(numbersMTN)
-        if ( numbersMTN.length == 1 ) {
-            console.log("On a Un numéro MTN ")
-            let res = await sendCreateCompteFinancier(operators[1].address,  numbersMTN[0].numero );
-
-            
-            const idCompte = res.data.data.idCompte;
-            console.log(res.data.data);
-            console.log(idCompte);
-
-            const finalTransactionsMOMO = transactionsMOMO.map( (el) => ({accountId : idCompte,...el}));
-
-            const result = await bulkCreateTransactions(finalTransactionsMOMO);
-            console.log(result.data)
-        }else if ( numbersMTN.length >1) {
-            console.log("On a "+ numbersMTN.length.toString() +" numéro MTN");
-
-            let comptes = [];
-            for (const number of numbersMTN) {
-                let c = {
-                    numero : number,
-                    operateur : operators[1].address
-                }
-                comptes.push(c)
-            }
-            console.log("Envoi de la requete de création des comptes MTN")
-            await sendBulkCreateCompteFinancier( comptes, "Mobile")
-
-        }
-        if (numbersMTN.length != 1) {
-            console.log ("on a pas un seul compte")
-            const result = await bulkCreateTransactions(transactionsMOMO);
-            console.log(result.data)
-        }
-        if (numbresOrange.length != 1) {
-            console.log ("on a pas un seul compte")
-            const result = await bulkCreateTransactions(transactionsOM);
-            console.log(result.data)
-        }
+        const transactionsOM = data.filter(t => (t.operator == operators[0].address));
+        const transactionsMOMO = data.filter(t => (t.operator == operators[1].address));
         const numbresOrange = getNumbrefromTransactions(transactionsOM);
+        console.log("Voici les numeros Orange ")
         console.log(numbresOrange)
-        
-        if ( numbresOrange.length == 1 ) {
-            console.log("On a Un numéro Orange ")
-            const res = await sendCreateCompteFinancier(operators[0].address,  numbresOrange[0].numero )
-            const idCompte = res.data.data.idCompte;
-            console.log(res.data.data);
-            console.log(idCompte);
+        const numbersMTN = getNumbrefromTransactions(transactionsMOMO);
+        console.log("Voici les numeros  MTN ")
+        console.log(numbersMTN)
+        await sendCreateCompteFinancier("Cash1" , "" , "Espece")
+        await this.setUpAccount(operators[0].address, transactionsOM, numbresOrange);
 
-            const finalTransactionsOM = transactionsOM.map( (el) => ({accountId : idCompte,...el}));
-            
-            const result = await bulkCreateTransactions(finalTransactionsOM);
-            console.log(result.data)
-        }else if ( numbresOrange.length >1) {
-            console.log("On a "+ numbresOrange.length.toString() +" numéro MTN");
-
-            let comptes = [];
-            for (const number of numbresOrange) {
-                let c = {
-                    numero : number,
-                    operateur : operators[0].address
-                }
-                comptes.push(c)
-            }
-            console.log("Envoi de la requete de création des comptes Orange")
-            await sendBulkCreateCompteFinancier( comptes, "Mobile")
-
-        }
-
+        await this.setUpAccount(operators[1].address, transactionsMOMO, numbersMTN);
 
         console.log("On a terminé l'initialisation")
+
         let compteOrange = undefined;
         let compteMTN = undefined;
 
-        if (transactionsOM.length > 0 ) {
+        if (transactionsOM.length > 0) {
             let totalEntree = 0;
             let toalSortie = 0;
-            transactionsOM.map((t)=>{
-                if(t.flux == "Entrant") totalEntree += t.amount;
+            transactionsOM.map((t) => {
+                if (t.flux == "Entrant") totalEntree += t.amount;
                 if (t.flux == "Sortant") toalSortie += t.amount;
             })
-            compteOrange =  {
-                numero : numbresOrange[0],
-                sommeEntree : totalEntree,
-                sommeSortie : toalSortie
+            compteOrange = {
+                numero: (numbresOrange.length > 0) ? numbresOrange[0] : '-',
+                sommeEntree: totalEntree,
+                sommeSortie: toalSortie
             }
         }
-        if (transactionsMOMO.length > 0 ) {
+        if (transactionsMOMO.length > 0) {
             let totalEntree = 0;
             let toalSortie = 0;
-            transactionsMOMO.map((t)=>{
-                if(t.flux == "Entrant") totalEntree += t.amount;
+            transactionsMOMO.map((t) => {
+                if (t.flux == "Entrant") totalEntree += t.amount;
                 if (t.flux == "Sortant") toalSortie += t.amount;
             })
-            compteMTN =  {
-                numero : numbersMTN[0],
-                sommeEntree : totalEntree,
-                sommeSortie : toalSortie
+            compteMTN = {
+                numero: (numbersMTN.length > 0) ? numbersMTN[0] : '-',
+                sommeEntree: totalEntree,
+                sommeSortie: toalSortie
             }
         }
 
@@ -279,10 +196,56 @@ export default class PluginInstalledSuccessfully extends React.Component {
             mtnSommeSortie: (compteMTN) ? compteMTN.sommeSortie : 0,
         }
         return OMEInfo;
-        // }
+
     }
+    /**
+     * 
+     * @param {*} operator 
+     * @param {PreProcessedTransaction[]} data 
+     */
+    async setUpAccount(operator, data, numbers) {
+        try {
+            if (data.length > 0) {
+                console.log("On a des transacions " + operator)
+                console.log(data);
 
 
+                if (numbers.length < 2) {
+
+                    console.log("On au moins Un numéro " + operator)
+
+                    let res = await sendCreateCompteFinancier(operator, (numbers.length == 1) ? numbers[0] : "", "Mobile");
+
+                    const idCompte = res.data.data.idCompte;
+                    console.log(res.data.data);
+                    console.log(idCompte);
+
+                    let finalTransactions = (numbers.length == 1) ? data.map((el) => ({ accountId: idCompte, ...el })) : data
+
+                    const result = await bulkCreateTransactions(finalTransactions);
+                    console.log(result.data)
+                } else {
+                    console.log("On a " + numbers.length.toString() + " numéro " + operator);
+
+                    let comptes = [];
+                    for (const number of numbers) {
+                        let c = {
+                            numero: number,
+                            operateur: operator
+                        }
+                        comptes.push(c)
+                    }
+                    console.log("Envoi de la requete de création des comptes " + operator)
+                    await sendBulkCreateCompteFinancier(comptes, "Mobile")
+
+                }
+            }
+        } catch (error) {
+            console.log("une erreur s'est produite lors de la création des comptes")
+            console.log(error)
+        }
+
+    }
 
     gotToPage(pageName, data = {}) {
         console.log("Allons sur la page " + pageName)
@@ -293,10 +256,11 @@ export default class PluginInstalledSuccessfully extends React.Component {
             <ScrollView style={styles.main}>
 
                 <View style={styles.boxCentral}>
-
+            
                     <Image style={styles.appLogo} source={imgWorkingAPI} />
 
-                    {!this.state.isThereError && <Text style={styles.title} >Plugin installé avec succès</Text>}
+                    <Text style={styles.title} >Processus de transformation de vos SMS en cours...</Text>
+                    <Image source={loading} style={styles.loading}></Image>
                     {this.state.isThereError && <Text style={styles.textError} > {this.state.errorMessage} </Text>}
                     {/* <Text style={styles.content} >Sans l’accès à vos SMS, nous ne vous serons d’aucune utilité.
                         A bientot</Text>
@@ -335,19 +299,13 @@ const styles = StyleSheet.create({
         height: 145,
         width: 145,
     },
-    title: {
-        textAlign: "center",
-        fontSize: 20,
-        fontWeight: "bold",
-        color: "red",
-        marginTop: 100
-    },
+ 
     title: {
         textAlign: "center",
         fontSize: 20,
         fontWeight: "bold",
         color: "black",
-        marginTop: 100
+        marginTop: 50
     },
     content: {
         padding: 30,
@@ -368,5 +326,22 @@ const styles = StyleSheet.create({
         //fontHeight: 12,
         fontWeight: 'bold',
         color: '#000000',
-    }
+    },
+    textError: {
+        color: "red",
+        alignSelf: "center",
+        marginTop: 15,
+        fontSize: 16,
+        textAlign: "justify",
+        paddingHorizontal: 10
+
+    },
+    loading: {
+        marginTop : 20,
+        height: 40,
+        width: 40,
+        alignSelf: "center",
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
 });

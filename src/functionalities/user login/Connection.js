@@ -92,8 +92,8 @@ export default class Connection extends React.Component {
 
             this.endAsyncOperation()
             //if (!user.emailVerified) return this.gotToPage("ShouldVerifyEmail", { email: this.state.email });
-            if (!(await isPermissionGranted())) return this.gotToPage("RequestPermission")
-            return this.gotToPage("PluginInstalledSuccessfully");
+            return this.gotToPage("RequestPermission")
+            //return this.gotToPage("PluginInstalledSuccessfully");
 
         } catch (error) {
 
@@ -193,6 +193,9 @@ export default class Connection extends React.Component {
                         onEndEditing={() => {
                             this.verifyEmail()
                         }}
+                        // onChange = {()=>{
+                        //     this.verifyEmail();
+                        // }}
                         style={styles.input}
                         placeholder="Insérez votre adresse email..."
                         placeholderTextColor="#000"
@@ -212,6 +215,9 @@ export default class Connection extends React.Component {
                             this.doingNewAction()
                             this.setState({ password: pw },)
                         }}
+                        // onChange = {()=>{
+                        //     this.this.verifyPassword()
+                        // }}
                         style={styles.input}
                     />
                 </View>

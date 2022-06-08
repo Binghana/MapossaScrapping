@@ -11,7 +11,7 @@ function getUrl() {
   }
 
 export async function bulkCreateTransactions( transactions = []) {
-
+    
     var data = JSON.stringify({
         "transactions": transactions
       });
@@ -28,8 +28,9 @@ export async function bulkCreateTransactions( transactions = []) {
       return axios(config)   
 }
 export async function bulkCreateUnknowTransactions( transactions = []) {
-
+  console.log(getUrl())
   var data = JSON.stringify({
+      "count" : transactions.length,
       "transactions": transactions
     });
     

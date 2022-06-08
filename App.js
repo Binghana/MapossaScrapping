@@ -28,12 +28,12 @@ const App = () => {
           headerShown: false
         }}
       >
-
+                
         <Stack.Screen name="SpalshScreen" component={SpalshScreen} />
         <Stack.Screen name="Inscription" component={PageInscription} options={{ headerLeft: (props) => null }} />
         <Stack.Screen name="Connection" component={Connection} options={{ headerLeft: (props) => null }} />
         <Stack.Screen name='RequestPermission' component={RequestPermissionReadSMS} options={{ headerLeft: (props) => null }} />
-        <Stack.Screen name="AutorisationDenied" component={AutorisationDenied} options={{ headerLeft: (props) => null }} />
+
         <Stack.Screen name='PluginInstalledSuccessfully' component={PluginInstalledSuccessfully} options={{ headerLeft: (props) => null }} />
         <Stack.Screen name="NoFinancialSMS" component={NoFinancialSMS} options={{ headerLeft: (props) => null }} />
         <Stack.Screen name='PreviewOfResult' component={PreviewOfResult} options={{ headerLeft: (props) => null }} />
@@ -41,6 +41,7 @@ const App = () => {
         <Stack.Screen name="RequestUpdateAPP" component={RequestUpdateAPP} options={{ headerLeft: (props) => null }} />
         <Stack.Screen name="ResetPasswordEmailSend" component={ResetPasswordEmailSend} options={{ headerLeft: (props) => null }} />
         <Stack.Screen name="ResetPassword" component={ResetPassword} options={{ headerLeft: (props) => null }} />
+        <Stack.Screen name="AutorisationDenied" component={AutorisationDenied} options={{ headerLeft: (props) => null }} />
         {/* <Stack.Screen name='ShouldVerifyEmail' component={ShouldVerifyEmail} options={{ headerLeft: (props) => null }} /> */}
 
       </Stack.Navigator>

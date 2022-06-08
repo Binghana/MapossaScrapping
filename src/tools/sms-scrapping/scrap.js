@@ -23,7 +23,8 @@ export default function scrap(smsArray) {
     /**
      * @type {PreProcessedTransaction[]}
      */
-     const unknownPreProcessedTransactions = [];
+    const unknownPreProcessedTransactions = [];
+
     for (const sms of smsArray) {
 
         // identification
@@ -48,26 +49,36 @@ export default function scrap(smsArray) {
                             const typeInit = operator.typeInitial[typeInitial];
                             // console.log("voici le type Initila questionné");
                             // console.log(typeInit)
+
                             if (matchModel(typeInit.modelFR, sms.body) ||
-                                (("modelEN" in typeInit) && matchModel(typeInitial.modelEN, sms.body))) {
+                                (("modelEN" in typeInit) && matchModel(typeInit.modelEN, sms.body))) {
                                 console.log("La transaction correspond au model : " + typeInitial)
                                 console.log(typeInitial)
-                                console.log("Voici la fonction de scrapping  : ")
+                                let t ;
+                                    if(("modelEN" in typeInit) && matchModel(typeInit.modelEN, sms.body)) {
+                                        try {
+                                            t =  operator.scrap[typeInitial](sms, preProcessedTransaction)
+                                        } catch (error) {
+                                            console.log(error);
+                                            console.log("Une erreur l'utilisation de la fonction de découpage avec le sms MOMO anglais")
+                                        }
+                                    }else {
+                                        t = operator.scrap[typeInitial](sms, preProcessedTransaction)
+                                    }
                                 
-                                const t = operator.scrap[typeInitial](sms, preProcessedTransaction)
+                               
 
-                                
                                 preProcessedTransactions.push(preProcessedTransaction)
                                 //const t = operator.scrap[typeInit](sms)
                                 // console.log("On a extrait les données de la transactions : ")
                                 // console.log(t)
 
-                            }else {
+                            } else {
                                 console.log("On a un souci de classification avec ce sms : ");
                                 console.log(sms)
-                                
+
                                 preProcessedTransaction.classification_error = true;
-                                preProcessedTransaction.hasError = true;
+                                
                                 console.log(preProcessedTransaction)
                                 unknownPreProcessedTransactions.push(preProcessedTransaction);
                             }
@@ -89,7 +100,7 @@ export default function scrap(smsArray) {
 
     }
     return {
-        "preProcessedTransaction" : preProcessedTransactions,
-        "unknownPreProcessedTransactions" : unknownPreProcessedTransactions
+        "preProcessedTransaction": preProcessedTransactions,
+        "unknownPreProcessedTransactions": unknownPreProcessedTransactions
     };
 }

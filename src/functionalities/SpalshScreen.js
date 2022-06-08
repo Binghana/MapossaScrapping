@@ -70,7 +70,10 @@ export default class SpalshScreen extends React.Component {
                 console.log(user)
                 let permissionsGranted = await isPermissionGranted()
                 //if (!user.emailVerified) return this.goToPage("ShouldVerifyEmail");
-                if (!permissionsGranted) return this.goToPage("AutorisationDenied");
+                console.log("Les permissions accordés ?")
+                console.log(permissionsGranted)
+                
+                if (!permissionsGranted) return this.goToPage("RequestPermission");
 
                 return this.goToPage("PluginInstalledSuccessfully")
 

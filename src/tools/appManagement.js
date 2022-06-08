@@ -108,14 +108,12 @@ export async function createAutoTransaction(data) {
 }
 
 
-export async function getIdUser() {
+export function getIdUser() {
 
-   
     if (!auth().currentUser) {
         console.log( "on a o pas actuelemnet d'utilisateur")
 
     }
-    
     return auth().currentUser.uid
     
 }

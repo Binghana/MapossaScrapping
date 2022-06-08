@@ -16,6 +16,9 @@ export default class AutorisationDenied extends React.Component {
         console.log("Allons sur la page " + pageName)
         this.props.navigation.navigate(pageName);
     }
+    requestPemi(){
+        this.goToPage("RequestPermission")
+    }
     render() {
         return (
             <ScrollView style={styles.main}>
@@ -29,7 +32,7 @@ export default class AutorisationDenied extends React.Component {
                         A bientot</Text>
 
                     <Pressable style={styles.button} onPress = {()=>{
-                        this.goToPage("RequestPermission")
+                        this.requestPemi()
                     }} >
                         <Text style={styles.buttonText}>J'ai Comrpis</Text>
                     </Pressable>

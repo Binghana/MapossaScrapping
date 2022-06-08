@@ -1,4 +1,12 @@
-export function matchModel(model, smsBody) {
+/**
+ * 
+ * @param {string[]} model 
+ * @param {string} smsBody 
+ * @param {string} lang 
+ * @returns 
+ */
+export function matchModel(model, smsBody ) {
+
     let match = true;
     if (model.length > 0) {
       model.map(pth => {
@@ -7,7 +15,40 @@ export function matchModel(model, smsBody) {
     }
     return match;
   }
+  export const modelMOMORetraitEn = [
+    "Withdrawn",
+    "XAF",
+    "Your new balance",
+    "Financial Transaction Id:"
+]
+export const modelMOMODepositEn = [
+    "You have received",
+    "XAF",
+    "Your new balance",
+    "Financial Transaction Id"
+]
+export const modelMOMOTransfertEntrantEn = [
+    "You have received",
 
+]
+export const modelMOMOTransfertSortantEn = [
+    "You have transferred",
+
+]
+export const modelMOMOPaiementCreditCommunicationEn = [
+    "MTNC AIRTIME",
+    "Financial Transaction Id:",
+    "Your new balance:",
+    "payment of",
+    "Fee was"
+]
+export const modelMOMOPaiementCreditInternetEn = [
+    "MTNC BUNDLES_FORFAITS",
+    "Fee was",
+    "A transaction of",
+    "Your new balance:",
+    "Financial Transaction Id:"
+]
 export const modelMOMOPaiementCreditCommunication = [
     "Votre paiement de ",
     " FCFA pour MTNC AIRTIME a ete effectue le ",
@@ -42,6 +83,7 @@ export const modelMOMORetrait = [
     '. Votre nouveau solde est ',
     '. Frais ',
 ];
+
 export const modelMOMOTransfertEntrant = [
     'Vous avez recu ',
     ' FCFA de ',
@@ -65,7 +107,6 @@ export const modelMOMOTransfertSortant = [
 
 export const modelOMDepot = [
     'Depot effectue par ',
-    ' to ',
     '. Informations detaillees: Montant de transaction : ',
     ' FCFA, ID transaction : ',
     ', Frais : ',
@@ -76,25 +117,22 @@ export const modelOMDepot = [
 ];
 
 export const modelOMRetrait = [
-    "Retrait d'argent reussi par le ",
-    ' avec le Code : ',
-    '. Informations detaillees : Montant: ',
-    ' FCFA, Frais: ',
-    ' FCFA, No de transaction ',
-    ', montant net debite ',
-    ' FCFA, Nouveau solde: ',
-    " FCFA."
+    "Retrait d'argent",
+    'Code',
+    'Informations detaillees',
+    'Frais',
+    'FCFA',
+    'montant',
+    'Nouveau solde: ',
+    "FCFA"
 ];
 export const modelOMTransfertEntrant = [
     'Transfert de ',
-    ' vers ',
-    ' reussi. Details: ID transaction: ',
-    ', Montant Transaction: ',
-    'FCFA, Frais: ',
-    ' FCFA, Commission: ',
-    ' FCFA, Montant Net: ',
-    ' FCFA, Nouveau Solde: ',
-    ' FCFA.',
+    'vers',
+    'Details',
+    'Montant Transaction: ',
+    'Frais: ',
+    'Commission: ',
 ];
 export const modelOMTransfertSortant = [
     "Transfert de ",

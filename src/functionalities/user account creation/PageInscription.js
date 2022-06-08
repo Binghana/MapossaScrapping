@@ -115,7 +115,7 @@ export default class PageInscription extends React.Component {
       console.log("L'email de vérification a été envoyé avec succès")
 
       this.endAsyncOperation()
-      this.gotToPage("RequestPermission", { email: this.state.email });
+      this.gotToPage("RequestPermission");
 
     } catch (error) {
       console.log("Une erreur est survennue")
@@ -246,6 +246,9 @@ export default class PageInscription extends React.Component {
             onEndEditing={() => {
               this.verifyEmail()
             }}
+          //   onChange = {()=>{
+          //     this.verifyEmail();
+          // }}
             style={styles.input}
             placeholder="Insérez votre adresse email..."
             placeholderTextColor="#000"
@@ -264,6 +267,9 @@ export default class PageInscription extends React.Component {
               this.doingNewAction()
               this.setState({ password: pw },)
             }}
+          //   onChange = {()=>{
+          //     this.verifyPassword();
+          // }}
             style={styles.input}
           />
         </View>

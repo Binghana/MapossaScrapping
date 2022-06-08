@@ -19,7 +19,7 @@ export default class RequestPermissionReadSMS extends React.Component {
         
         if (permissionAlreadyGranted){ 
             
-            console.log("La permissions a dékà été accordé")
+            console.log("La permissions a déjà été accordé")
             this.goToPage("PluginInstalledSuccessfully")
     
         }else console.log("La permissions n'a pas encore été accordé");

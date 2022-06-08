@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { sendCreateCompteFinancier } from "../../services/API/mapossaDataTech/CompteFinanciers";
 import { isGoodNumtelMTNCameroon, isGoodNumtelOrangeCameroon } from "../../tools/verification/RegExp";
-import { imgSorry, logoOrange, logoMTN } from "../../tools/ressources/Images"
+import { imgSorry} from "../../tools/ressources/Images"
 import { operators } from "../../tools/sms-scrapping/operators";
 
 
@@ -108,40 +108,13 @@ export default class NoFinancialSMS extends React.Component {
                     <Image style={styles.appLogo} source={imgSorry} />
 
                     <Text style={styles.title} >Pas de SMS d’OME trouvé sur votre téléphone</Text>
-                    <Text style={styles.content} >Vous n’avez pas de SMS de notification des operateurs de monnaie electronique à transformer en transaction</Text>
-                    <Text style={styles.content} >Veuillez entrer vos numeros ici pour commencer</Text>
-                    <View style={styles.boxInputNum}>
-
-                        <View style={styles.containernumber}>
-                            <Image style={styles.logo} source={logoOrange} />
-                            <TextInput style={styles.input}
-                                onChangeText={(text) => {
-                                    this.setState({ orangeNumber: text })
-                                }}
-                                onEndEditing={() => {
-                                    this.setUpNumber(om.address)
-                                }}
-                            />
-                        </View>
-
-                        <View style={styles.containernumber}>
-                            <Image style={styles.logo} source={logoMTN} />
-                            <TextInput style={styles.input}
-                                onChangeText={(text) => {
-                                    this.setState({ mtnNumber: text })
-                                }}
-                                onEndEditing={() => {
-                                    this.setUpNumber(momo.address)
-                                }}
-
-                            />
-                        </View>
-
-                    </View>
-                    <Pressable style={(this.state.buttonDisabled) ? styles.buttonDisable : styles.button} disabled={this.state.buttonDisabled} onPress = {()=>{this.createCompteFinanciers()}} >
+                    <Text style={styles.content} >Désolé, vous ne pourrez pas profiter de l’experience que fournit Mapossa SmartWallet si vous n’avez pas de SMS de confirmation de paiement.</Text>
+                    {/* <Text style={styles.content} >Veuillez entrer vos numeros ici pour commencer</Text> */}
+                    
+                    {/* <Pressable style={(this.state.buttonDisabled) ? styles.buttonDisable : styles.button} disabled={this.state.buttonDisabled} onPress = {()=>{this.createCompteFinanciers()}} >
                         <Text style={styles.buttonText}>Suivant</Text>
                         {this.state.isLoading && <Image source={loading} style={styles.loading}></Image>}
-                    </Pressable>
+                    </Pressable> */}
 
                 </View>
             </ScrollView>
@@ -188,6 +161,7 @@ const styles = StyleSheet.create({
         backgroundColor: "white"
     },
     boxCentral: {
+        marginTop : 100,
         marginHorizontal: '8%',
         alignSelt: 'center',
 
@@ -205,9 +179,10 @@ const styles = StyleSheet.create({
     },
     content: {
         padding: 20,
+        marginTop : 20,
         textAlign: "center",
         fontSize: 16,
-        fontWeight: "400",
+        fontWeight: "300",
         color: "black"
     },
     buttonText: {

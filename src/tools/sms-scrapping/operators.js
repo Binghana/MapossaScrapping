@@ -2,7 +2,7 @@ import { scrapInternetCreditMOMO } from "./mobile money/internetCredit";
 import { scrapTransfertInMOMO } from "./mobile money/transferIn";
 import { scrapTransfertOutMOMO } from "./mobile money/transferOut";
 import { scrapWithdrawalMOMO } from "./mobile money/withdrawal";
-import { modelMOMODeposit, modelMOMOPaiementCreditCommunication, modelMOMOPaiementCreditInternet, modelMOMORetrait, modelMOMOTransfertEntrant, modelMOMOTransfertSortant, modelOMDepot, modelOMPaiementCreditCommunication, modelOMPaiementCreditInternet, modelOMRetrait, modelOMTransfertEntrant, modelOMTransfertSortant } from "./models";
+import { modelMOMODeposit, modelMOMODepositEn, modelMOMOPaiementCreditCommunication, modelMOMOPaiementCreditCommunicationEn, modelMOMOPaiementCreditInternet, modelMOMOPaiementCreditInternetEn, modelMOMORetrait, modelMOMORetraitEn, modelMOMOTransfertEntrant, modelMOMOTransfertEntrantEn, modelMOMOTransfertSortant, modelMOMOTransfertSortantEn, modelOMDepot, modelOMPaiementCreditCommunication, modelOMPaiementCreditInternet, modelOMRetrait, modelOMTransfertEntrant, modelOMTransfertSortant } from "./models";
 import { scrapCommunicationCreditOM } from "./orange money/communicationCredit";
 import { scrapInternetCreditOM } from "./orange money/internetCredit";
 import { scrapTransfertInOM } from "./orange money/transferIn";
@@ -53,21 +53,27 @@ export const operators = [
         typeInitial : {
             retrait:{
                 modelFR : modelMOMORetrait ,
+                modelEN : modelMOMORetraitEn
             },
             transfertEntrant : {
                 modelFR : modelMOMOTransfertEntrant,
+                modelEN : modelMOMOTransfertEntrantEn
             },
             transfertSortant : {
                 modelFR : modelMOMOTransfertSortant,
+                modelEN : modelMOMOTransfertSortantEn
             },
             depot : {
                 modelFR : modelMOMODeposit,
+                modelEN : modelMOMODepositEn
             },
             paiementCreditInternet : {
                 modelFR : modelMOMOPaiementCreditInternet,
+                modelEN : modelMOMOPaiementCreditInternetEn
             },
             paiementCreditCommunication : {
                 modelFR : modelMOMOPaiementCreditCommunication,
+                modelEN : modelMOMOPaiementCreditCommunicationEn
             }
         },
         scrap : {
