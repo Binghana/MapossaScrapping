@@ -92,7 +92,7 @@ export default class Connection extends React.Component {
 
             this.endAsyncOperation()
             //if (!user.emailVerified) return this.gotToPage("ShouldVerifyEmail", { email: this.state.email });
-            return this.gotToPage("RequestPermission")
+            
             //return this.gotToPage("PluginInstalledSuccessfully");
 
         } catch (error) {

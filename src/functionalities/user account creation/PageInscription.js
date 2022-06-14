@@ -115,7 +115,7 @@ export default class PageInscription extends React.Component {
       console.log("L'email de vérification a été envoyé avec succès")
 
       this.endAsyncOperation()
-      this.gotToPage("RequestPermission");
+      
 
     } catch (error) {
       console.log("Une erreur est survennue")

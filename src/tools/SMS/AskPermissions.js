@@ -28,7 +28,7 @@ export const filter = {
   /** the next 2 filters can be used for pagination **/
   /*indexFrom: 0, // start from index 0
   maxCount: 10, // count of SMS to return each time*/
-  //address: '(.*)'+momo.address+'(.*)', // sender's phone number regex match
+  address: '(.*)'+addressRegexp()+'(.*)', // sender's phone number regex match
 }
 
 export async function requestPermissions() {
@@ -65,4 +65,7 @@ export async function requestPermissions() {
   }
   export async function isPermissionGranted (){
     return await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.READ_SMS)
+  }
+  export function addressRegexp() {
+    return "OrangeMoney|MobileMoney"
   }

@@ -11,7 +11,7 @@ const om = operators[0];
 
 async function getUrl() {
 
-  return baseUrl + "/user/" + getIdUser() + "/compteFinanciers/";
+  return baseUrl + "/user/" + getIdUser() + "/compteFinanciers";
 
 }
 
@@ -27,7 +27,7 @@ function getLogoOperateur(operateur) {
   if (operateur == om.address) return "https://firebasestorage.googleapis.com/v0/b/mapossadatatech.appspot.com/o/OM.png?alt=media&token=80ab2d59-7250-4bb6-a19d-c7ac972d1f29"
   if (operateur == "Cash1") return "https://firebasestorage.googleapis.com/v0/b/mapossadatatech.appspot.com/o/Billets.png?alt=media&token=aa47789d-c656-4551-9684-bb53e7c0fd73";
 }
-export async function sendCreateCompteFinancier(operateur, numero , typeCompte) {
+export async function sendCreateCompteFinancier(operateur, numero, typeCompte) {
 
   console.log(operateur)
   console.log(numero)
@@ -39,10 +39,10 @@ export async function sendCreateCompteFinancier(operateur, numero , typeCompte) 
     "idOperateur": getIdOperateur(operateur),
     "sommeSortie": 0,
     "sommeEntree": 0,
-    "typeCompte" : typeCompte, 
+    "typeCompte": typeCompte,
     "logoOperateur": getLogoOperateur(operateur),
-    "nomOperateur" : operateur,
-    "isAuto" : true
+    "nomOperateur": operateur,
+    "isAuto": true
   });
   console.log(data)
 
@@ -74,7 +74,7 @@ export async function getUserAllCompteFinanciers() {
  * @param {*} typeCompte 
  * @returns 
  */
-export async function sendBulkCreateCompteFinancier( comptes, typeCompte) {
+export async function sendBulkCreateCompteFinancier(comptes, typeCompte) {
   let comptess = [];
   for (const compte of comptes) {
     let c = {
@@ -84,15 +84,15 @@ export async function sendBulkCreateCompteFinancier( comptes, typeCompte) {
       "idOperateur": getIdOperateur(compte.operateur),
       "sommeSortie": 0,
       "sommeEntree": 0,
-      "typeCompte" : typeCompte, 
+      "typeCompte": typeCompte,
       "logoOperateur": getLogoOperateur(compte.operateur),
-      "nomOperateur" : compte.operateur,
-      "isAuto" : true
+      "nomOperateur": compte.operateur,
+      "isAuto": true
     }
     comptess.push(c)
   }
   var data = JSON.stringify({
-    "comptes" : comptess
+    "comptes": comptess
   });
 
   var config = {
@@ -107,3 +107,17 @@ export async function sendBulkCreateCompteFinancier( comptes, typeCompte) {
   return axios(config)
 
 }
+
+export async function getAllAccoount() {
+  var config = {
+    method: 'get',
+    url:  getUrl() + '?typeCompte=Mobile',
+    headers: {}
+  };
+
+  const response = await axios(config)
+
+    return response.data.data;
+  
+}
+

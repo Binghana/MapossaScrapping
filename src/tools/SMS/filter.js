@@ -1,4 +1,3 @@
-import momo from "../sms-scrapping/MOMO/momo";
 
 
 const filter = {
@@ -27,7 +26,7 @@ const filter = {
     /** the next 2 filters can be used for pagination **/
     /*indexFrom: 0, // start from index 0
     maxCount: 10, // count of SMS to return each time*/
-    address: '(.*)'+momo.address+'(.*)', // sender's phone number regex match
+    address: '(.*)OrangeMoney|MobileMoney(.*)', // sender's phone number regex match
 }
 
 export default filter;

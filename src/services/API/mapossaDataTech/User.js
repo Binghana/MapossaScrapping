@@ -1,5 +1,6 @@
 import { baseUrl } from "./Const";
 import axios from "axios";
+import { getIdUser } from "../../../tools/appManagement";
 
 // import axios from "axios";
 
@@ -53,3 +54,19 @@ export async function sendCreateUserRequest(uid , notificationToken) {
    return axios(config);
     
 } 
+
+
+export async function getUserAdaloId () {
+  var config = {
+    method: 'get',
+    url: 'https://us-central1-mapossadatatech.cloudfunctions.net/user/' + getIdUser(),
+    headers: { 
+      'Authorization': 'Bearer d0ba757rxo4l7unzobkgo5bsu'
+    }
+  };
+  
+  const res = await axios(config)
+  
+  return response.data.data.idAdalo;
+}
+

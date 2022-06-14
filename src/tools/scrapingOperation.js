@@ -16,7 +16,7 @@ export function getFrequentNumberOfOperator(tabTransactionOfOperator = []) {
     tabTransactionOfOperator.forEach((transaction) => {
         let index = -1;
         if (numbers.length > 0) index = numbers.findIndex(el => el.numero == transaction.numero);
-        if (transaction.numero) console.log(transaction.numero); console.log(numbers);
+        //if (transaction.numero) console.log(transaction.numero); console.log(numbers);
         if (transaction.numbers == undefined) console.info(transaction);
         if (index < 0) {
             if ("numero" in transaction) numbers.push({ numero: transaction.numero, occurence: 1 });
@@ -37,14 +37,14 @@ export function getFrequentNumberOfOperator(tabTransactionOfOperator = []) {
 export function getOperatorNumbers(data, operateur) {
     let tabTransaction = [];
     if (operateur == om.address) {
-        console.log("Voici les transactions orange à partir dèsquels que l'on doit tirer les numéros")
-        console.log(tabTransaction);
+        // console.log("Voici les transactions orange à partir dèsquels que l'on doit tirer les numéros")
+        // console.log(tabTransaction);
         if (data.transactions.om.transfertSortant.length > 0) tabTransaction = data.transactions.om.transfertSortant;
         else if (data.transactions.om.transfertEntrant.length > 0) tabTransaction = data.transactions.om.transfertEntrant;
     } else {
         if (data.transactions.momo.transfertSortant.length > 0) {
-            console.log("Voici les transactions MTN à partir dèsquels que l'on doit tirer les numéros")
-            console.log(tabTransaction);
+            // console.log("Voici les transactions MTN à partir dèsquels que l'on doit tirer les numéros")
+            // console.log(tabTransaction);
             tabTransaction = data.transactions.momo.transfertSortant
         }
     }

@@ -12,7 +12,7 @@ import SmsAndroid from "react-native-get-sms-android-v2";
 import { filter, isPermissionGranted } from "../../tools/SMS/AskPermissions";
 import ScrappingError from "../../tools/error/ScrappingError";
 import scrap from "../../tools/sms-scrapping/scrap.js"
-import { getUserAllCompteFinanciers, sendBulkCreateCompteFinancier, sendCreateCompteFinancier } from "../../services/API/mapossaDataTech/CompteFinanciers";
+import { getAllAccoount, getUserAllCompteFinanciers, sendBulkCreateCompteFinancier, sendCreateCompteFinancier } from "../../services/API/mapossaDataTech/CompteFinanciers";
 
 
 import { getUserCredentials, storage, storageKey } from "../../tools/utilities";
@@ -23,6 +23,7 @@ import { getNumbrefromTransactions } from "../../tools/scrapingOperation";
 import { PreProcessedTransaction } from "../../tools/sms-scrapping/preProcessedTransactions";
 import { bulkCreateTransactions, bulkCreateUnknowTransactions } from "../../services/API/mapossaDataTech/Transactions";
 import { ERROR_NO_NETWORK } from "../../tools/error/ErrorMessages";
+import { createAccountOnAdalo } from "../../services/API/adalo/comptefinancier";
 
 const loading = require("../../ressources/images/loader.gif");
 export default class PluginInstalledSuccessfully extends React.Component {
@@ -30,7 +31,8 @@ export default class PluginInstalledSuccessfully extends React.Component {
         super(props)
         this.state = {
             isThereError: false,
-            errorMessage: "Une erreur est suvennue, veuillez nous contacter"
+            errorMessage: "Une erreur est suvennue, veuillez nous contacter",
+            messageState: "Processus de transformation de vos SMS en cours..."
         }
     }
     async componentDidMount() {
@@ -43,7 +45,7 @@ export default class PluginInstalledSuccessfully extends React.Component {
             if (!permiGanted) {
                 return this.gotToPage("RequestPermission")
             }
-            
+
             return SmsAndroid.list(
                 JSON.stringify(filter),
                 fail => {
@@ -53,14 +55,15 @@ export default class PluginInstalledSuccessfully extends React.Component {
                     try {
                         const tabSMS = JSON.parse(smsList)
                         console.log("on a récupéré " + count)
-
-                        const results = scrap(tabSMS);
-                        //await this.saveUnkown(results.unknownPreProcessedTransactions);
+                        this.updateStateMessage("on a récupéré " + count + " sms utilisable")
+                        const results = scrap(tabSMS, this.updateStateMessage("Une erreur est survennue pendant le scrap "));
+                        this.updateStateMessage("Nous avons trouvé " + results.unknownPreProcessedTransactions.length + " sms inconnues \nNous avons trouvé " + results.preProcessedTransaction.length + " sms connues ")
+                        await this.saveUnkown(results.unknownPreProcessedTransactions);
+                        this.updateStateMessage("Nous avons terminé de sauvegardé les inconnues")
+                        console.log(results)
                         if (results.preProcessedTransaction.length < 1) throw new ScrappingError(ScrappingError.ERROR_NO_FINANCIAL_SMS);
+                        this.updateStateMessage("Nous traitements et rangements des flux par OME")
                         const OMEInfo = await this.getOMEfinancialInformations(results.preProcessedTransaction);
-
-
-
 
 
                         this.gotToPage("PreviewOfResult", OMEInfo);
@@ -116,6 +119,9 @@ export default class PluginInstalledSuccessfully extends React.Component {
         }
 
     }
+    updateStateMessage(message) {
+        this.setState({ messageState: message })
+    }
     showError(message = "Une erreur est suvennue, veuillez nous contacter") {
 
         this.setState({ isThereError: true, errorMessage: message })
@@ -150,12 +156,20 @@ export default class PluginInstalledSuccessfully extends React.Component {
         const numbersMTN = getNumbrefromTransactions(transactionsMOMO);
         console.log("Voici les numeros  MTN ")
         console.log(numbersMTN)
-        await sendCreateCompteFinancier("Cash1" , "" , "Espece")
-        await this.setUpAccount(operators[0].address, transactionsOM, numbresOrange);
-
-        await this.setUpAccount(operators[1].address, transactionsMOMO, numbersMTN);
-
-        console.log("On a terminé l'initialisation")
+        try {
+            this.updateStateMessage("Création des comptes automatiques...")
+            await sendCreateCompteFinancier("Cash1", "", "Espece")
+            this.updateStateMessage("Comptes Espèces crées, Création des comptes Mobiles...")
+            await this.setUpAccount(operators[0].address, transactionsOM, numbresOrange);
+    
+            await this.setUpAccount(operators[1].address, transactionsMOMO, numbersMTN);
+    
+            console.log("On a terminé l'initialisation")
+        } catch (error) {
+            //onsole.log()
+            //this.updateStateMessage("Il semblerait qu'il yait déjà un coptes ...")
+        }
+        
 
         let compteOrange = undefined;
         let compteMTN = undefined;
@@ -213,16 +227,19 @@ export default class PluginInstalledSuccessfully extends React.Component {
                 if (numbers.length < 2) {
 
                     console.log("On au moins Un numéro " + operator)
+                    this.updateStateMessage("Création du compte automatique " + operator + " ...")
 
+                    console.log(numbers)
                     let res = await sendCreateCompteFinancier(operator, (numbers.length == 1) ? numbers[0] : "", "Mobile");
-
+                    this.updateStateMessage("Création du compte automatique " + operator + " crées avec succès \nEnregistrement des transactions auto ")
                     const idCompte = res.data.data.idCompte;
                     console.log(res.data.data);
                     console.log(idCompte);
 
-                    let finalTransactions = (numbers.length == 1) ? data.map((el) => ({ accountId: idCompte, ...el })) : data
+                    let finalTransactions = (numbers.length == 1) ? data.map((el) => ({ ...el, accountId: idCompte })) : data
 
                     const result = await bulkCreateTransactions(finalTransactions);
+                    this.updateStateMessage("Création des transactions auto réussis ...")
                     console.log(result.data)
                 } else {
                     console.log("On a " + numbers.length.toString() + " numéro " + operator);
@@ -236,8 +253,24 @@ export default class PluginInstalledSuccessfully extends React.Component {
                         comptes.push(c)
                     }
                     console.log("Envoi de la requete de création des comptes " + operator)
+                    this.updateStateMessage("Création des comptes " + operator + " ...")
                     await sendBulkCreateCompteFinancier(comptes, "Mobile")
 
+                    try {
+                        /**
+                         * @type {any[]}
+                         */
+                        const accounts = await getAllAccoount();
+                        
+                        for (const account of accounts) {
+                            createAccountOnAdalo(account);
+                        }
+
+                    } catch (error) {
+                        console.log("Erreur lors de la création des comptes Adalo")
+                    }   
+
+                    this.updateStateMessage("Fin de la Création des comptes " + operator + " ! ")
                 }
             }
         } catch (error) {
@@ -249,6 +282,7 @@ export default class PluginInstalledSuccessfully extends React.Component {
 
     gotToPage(pageName, data = {}) {
         console.log("Allons sur la page " + pageName)
+        this.updateStateMessage("Allons sur la page " + pageName + " ...")
         this.props.navigation.navigate(pageName, data);
     }
     render() {
@@ -256,10 +290,10 @@ export default class PluginInstalledSuccessfully extends React.Component {
             <ScrollView style={styles.main}>
 
                 <View style={styles.boxCentral}>
-            
+
                     <Image style={styles.appLogo} source={imgWorkingAPI} />
 
-                    <Text style={styles.title} >Processus de transformation de vos SMS en cours...</Text>
+                    <Text style={styles.title} >{this.state.messageState}</Text>
                     <Image source={loading} style={styles.loading}></Image>
                     {this.state.isThereError && <Text style={styles.textError} > {this.state.errorMessage} </Text>}
                     {/* <Text style={styles.content} >Sans l’accès à vos SMS, nous ne vous serons d’aucune utilité.
@@ -299,7 +333,7 @@ const styles = StyleSheet.create({
         height: 145,
         width: 145,
     },
- 
+
     title: {
         textAlign: "center",
         fontSize: 20,
@@ -337,7 +371,7 @@ const styles = StyleSheet.create({
 
     },
     loading: {
-        marginTop : 20,
+        marginTop: 20,
         height: 40,
         width: 40,
         alignSelf: "center",

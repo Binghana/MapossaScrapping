@@ -11,6 +11,8 @@ import { PreProcessedTransaction } from "../preProcessedTransactions";
  */
 
  export function scrapInternetCreditMOMO( sms , preProcessedTransaction ) {
+
+    preProcessedTransaction.finalType = "Depense"
     preProcessedTransaction.initialType = "Paiement";
     preProcessedTransaction.flux = "Sortant";
     preProcessedTransaction.amount = getNumberFromKeyword(amountKeywords , sms.body);

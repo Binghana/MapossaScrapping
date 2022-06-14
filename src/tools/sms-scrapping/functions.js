@@ -1,5 +1,6 @@
 
-import  { montantWithDecimal , alphaIdNumber , alpa } from "./regexp"
+import { montantWithDecimal, alphaIdNumber, alpa } from "./regexp"
+
 
 /**
  * Cette fonction trouve un nombre qui suit le mot clés puis retourne sa valeur
@@ -49,7 +50,7 @@ export function getDateFromSMS(sms) {
  * @param { object } sms object epresentationg the sms
  * @return { object }
  */
- export function getHourFromSMS(sms) {
+export function getHourFromSMS(sms) {
     if ("date_sent" in sms) {
 
         return new Date(sms.date_sent).getHours();
@@ -62,36 +63,47 @@ export function getDateFromSMS(sms) {
  * @param {string} sms the string represantating the body of the sms
  */
 export function getUserName(keywords, sms) {
-    for (const keyword of keywords) {
-        if (!("start" in keyword && "end" in keyword)) {
-            // console.log("Le mot clé donné n'a pas de début ou de fin");
+    try {
+        for (const keyword of keywords) {
 
-        } else {
-            
-            if (sms.includes(keyword.start) && sms.includes(keyword.end)) {
+            if (!("start" in keyword && "end" in keyword)) {
+                //console.log("Le mot clé donné n'a pas de début ou de fin");
 
-                let positionStart = sms.indexOf(keyword.start) + keyword.start.length;
-                // console.log("Voici la position du mot clé de début " + keyword.start + " : " + positionStart.toString())
-                let positionEnd = sms.indexOf(keyword.end);
-               
-                // console.log("Voici la position du mot clé de fin " + keyword.end + " : " + positionEnd.toString())
-                let splitedSms = sms.substring( positionStart,positionEnd);
-                // console.log("Voici la partie entre les 2 mots clefs ");
-                // console.log(splitedSms);
+            } else {
+
+                if (sms.includes(keyword.start) && sms.includes(keyword.end)) {
+
+                    let positionStart = sms.indexOf(keyword.start) + keyword.start.length;
+                    console.log("Voici la position du mot clé de début " + keyword.start + " : " + positionStart.toString())
+                    let positionEnd = sms.indexOf(keyword.end);
+
+                    // console.log("Voici la position du mot clé de fin " + keyword.end + " : " + positionEnd.toString())
+                    let splitedSms = sms.substring(positionStart, positionEnd);
+                    // console.log("Voici la partie entre les 2 mots clefs ");
+                    // console.log(splitedSms);
 
 
-                let allMatches = splitedSms.match(alpa);
-                // console.log("On a des match")
-                // console.log(allMatches)
-                let whatWeWant = ""
-                for (const name of allMatches) {
-                    whatWeWant += ` ${name}`
+                    let allMatches = splitedSms.match(alpa);
+                    // console.log("On a des match")
+                    // console.log(allMatches)
+                    let whatWeWant = ""
+                    if (allMatches) {
+                        for (const name of allMatches) {
+                            whatWeWant += ` ${name}`
+                        }
+                    }
+                    
+                    return whatWeWant;
                 }
-                return whatWeWant;
             }
         }
+        return null;
+    } catch (error) {
+        console.log("ERR GET NAMe")
+        console.error(error)
+        throw "stop"
     }
-    return null;
+
 }
 /**
  * Cette fonction trouve un nombre qui suit le mot clés puis retourne sa valeur
@@ -105,7 +117,7 @@ export function getUserName(keywords, sms) {
  */
 
 
- export function getOrangeTransactionID(keywords, sms) {
+export function getOrangeTransactionID(keywords, sms) {
 
     for (const keyword of keywords) {
         if (sms.includes(keyword)) {
