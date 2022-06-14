@@ -48,3 +48,33 @@ export async function getUserCredentials(){
 }
 
 
+export function toAmountFormat ( amount ) {
+  const pieces = parseFloat(amount).toFixed(2).split('')
+  
+  let ii = pieces.length - 3
+  while ((ii-=3) > 0) {
+    pieces.splice(ii, 0, '.')
+  }
+
+  pieces.pop()
+  pieces.pop()
+  pieces.pop()
+  return pieces.join('')
+  //return Intl.NumberFormat("fr-FR").format(amount)
+  //return Intl.NumberFormat('fr-FR').format(amount)
+  return amount
+}
+
+/**
+ * 
+ * @param {Number} number 
+ */
+export function toNumberFormat ( number) {
+    if (number.toString().length == 9) {
+      return "+237" + number;
+    }
+    if (number.toString().length == 12) {
+      return "+" + number;
+    }
+    return number
+}

@@ -2,8 +2,7 @@ import TouchHistoryMath from "react-native/Libraries/Interaction/TouchHistoryMat
 
 export class PreProcessedTransaction {
 
-    constructor(baseSMS) {
-
+    constructor(baseSMS , operator = null , service_center = null) {
 
         this.baseSMS = baseSMS;
         
@@ -11,8 +10,8 @@ export class PreProcessedTransaction {
         this.finalType = null;
         this.decision = null;
         this.flux = null;
-        this.operator = null;
-        this.serviceCenter = null;
+        this.operator = operator;
+        this.serviceCenter = service_center;
         
         this.accountId = null;
 
@@ -34,22 +33,9 @@ export class PreProcessedTransaction {
         
         this.isAuto = true;
 
-        this.hasError = false ;
+        this.risk = false;
+        this.error = false;
+        this.problem = false;
 
-        this.amount_error = false;
-        this.fees_error = false;
-        this.date_error = false;
-
-        this.balance_error = false;
-        
-        this.classification_error = false ;
-        this.verification_error = false;
-
-        this.user_verification = false;
-
-    }
-    
-    checkError() {
-        this.hasError = ( this.amount_error || this.balance_error || this.fees_error || this.date_error );
     }
 }

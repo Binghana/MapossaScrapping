@@ -15,7 +15,7 @@ import scrap from "../../tools/sms-scrapping/scrap.js"
 import { getAllAccoount, getUserAllCompteFinanciers, sendBulkCreateCompteFinancier, sendCreateCompteFinancier } from "../../services/API/mapossaDataTech/CompteFinanciers";
 
 
-import { getUserCredentials, storage, storageKey } from "../../tools/utilities";
+import { getUserCredentials, storage, storageKey, toAmountFormat, toNumberFormat } from "../../tools/utilities";
 import ClientError from "../../tools/error/ClientError";
 import auth from "@react-native-firebase/auth"
 import { operators } from "../../tools/sms-scrapping/operators";
@@ -38,10 +38,9 @@ export default class PluginInstalledSuccessfully extends React.Component {
     async componentDidMount() {
         try {
 
-            console.log("Nous sommes arrivés sur la page de succès d'installation du plugin")
-
-            console.log("Récuperons les sms de l'utilisateur")
+            this.updateStateMessage("Vérification des permissions")
             const permiGanted = await isPermissionGranted()
+
             if (!permiGanted) {
                 return this.gotToPage("RequestPermission")
             }
@@ -52,19 +51,26 @@ export default class PluginInstalledSuccessfully extends React.Component {
                     throw fail;
                 },
                 async (count, smsList) => {
-                    try {
-                        const tabSMS = JSON.parse(smsList)
-                        console.log("on a récupéré " + count)
-                        this.updateStateMessage("on a récupéré " + count + " sms utilisable")
-                        const results = scrap(tabSMS, this.updateStateMessage("Une erreur est survennue pendant le scrap "));
-                        this.updateStateMessage("Nous avons trouvé " + results.unknownPreProcessedTransactions.length + " sms inconnues \nNous avons trouvé " + results.preProcessedTransaction.length + " sms connues ")
-                        await this.saveUnkown(results.unknownPreProcessedTransactions);
-                        this.updateStateMessage("Nous avons terminé de sauvegardé les inconnues")
-                        console.log(results)
-                        if (results.preProcessedTransaction.length < 1) throw new ScrappingError(ScrappingError.ERROR_NO_FINANCIAL_SMS);
-                        this.updateStateMessage("Nous traitements et rangements des flux par OME")
-                        const OMEInfo = await this.getOMEfinancialInformations(results.preProcessedTransaction);
 
+                    this.updateStateMessage("On a récupéré " + count + " Début du traitement des sms...")
+                    if (count < 1) {
+                        return this.gotToPage("NoFinancialSMS");
+                    }
+
+                    try {
+
+                        const tabSMS = JSON.parse(smsList)
+
+                        const results = await scrap(tabSMS);
+
+                        //this.updateStateMessage("Nous avons trouvé Nous avons trouvé " + results.length + " sms connues ")
+                        //await this.saveUnkown(results.unknownPreProcessedTransactions);
+                        //this.updateStateMessage("Nous avons terminé de sauvegardé les inconnues")
+                        // console.log(results)
+                        // console.log("voici le résultat plus haut")
+                        if (!this.verifyPreProcessedTransactions(results)) return this.gotToPage("NoFinancialSMS");
+                        this.updateStateMessage("Nous traitements et rangements des flux par OME")
+                        const OMEInfo = await this.getOMEfinancialInformations(results);
 
                         this.gotToPage("PreviewOfResult", OMEInfo);
 
@@ -82,25 +88,25 @@ export default class PluginInstalledSuccessfully extends React.Component {
                         if (error instanceof ScrappingError) {
                             if (error.code == ScrappingError.ERROR_MORE_THAN_2_NUMBERS) return this.gotToPage("AlertMoreThan2Number");
                             if (error.code == ScrappingError.ERROR_NO_FINANCIAL_SMS) {
-                                console.log("L'utilisateur n'as pas de sms fianciers")
-                                const res = await getUserAllCompteFinanciers();
-                                console.log("on a récupérer les ocmptes de l'utilisateur")
-                                if (res.data.data) {
-                                    /**
-                                     * @type {Array}
-                                     */
+                                // console.log("L'utilisateur n'as pas de sms fianciers")
+                                // const res = await getUserAllCompteFinanciers();
+                                // console.log("on a récupérer les ocmptes de l'utilisateur")
+                                // if (res.data.data) {
+                                //     /**
+                                //      * @type {Array}
+                                //      */
 
-                                    const comptes = res.data.data;
-                                    if (comptes.length > 0) {
-                                        console.log("l'utilisateur a des comptes")
-                                        const OMEInfo = await this.getOMEfinancialInformations(comptes);
-                                        this.gotToPage("PreviewOfResult", OMEInfo);
-                                    } else {
-                                        this.gotToPage("NoFinancialSMS");
-                                    }
-                                } else {
-                                    this.gotToPage("NoFinancialSMS");
-                                }
+                                //     const comptes = res.data.data;
+                                //     if (comptes.length > 0) {
+                                //         console.log("l'utilisateur a des comptes")
+                                //         const OMEInfo = await this.getOMEfinancialInformations(comptes);
+                                //         this.gotToPage("PreviewOfResult", OMEInfo);
+                                //     } else {
+                                //         this.gotToPage("NoFinancialSMS");
+                                //     }
+                                // } else {
+                                //     this.gotToPage("NoFinancialSMS");
+                                // }
 
                             }
                         }
@@ -109,15 +115,19 @@ export default class PluginInstalledSuccessfully extends React.Component {
             );
 
         } catch (error) {
-            console.log("Une erreur est survennue avec les permissions")
-            console.log(error)
-            let user;
-            if (auth().currentUser) user = auth().currentUser; else user = await getUserCredentials();
-            let unkowError = new ClientError(user, error, " ", " on componenet did mount", "Maybe looking at permissions", "PluginInstalledSuccessfully")
-            await unkowError.save()
-            this.showError();
+
+            this.updateStateMessage("Une erreur est survennue avec lors de la récupération des sms")
         }
 
+    }
+    /**
+     * 
+     * @param {PreProcessedTransaction[]} results 
+     */
+    verifyPreProcessedTransactions(results) {
+        const good = results.filter(t => ((t.operator == operators[0].address || t.operator == operators[1].address) && !t.error && !t.problem && !t.risk));
+        //console.log(good)
+        return (good.length > 0);
     }
     updateStateMessage(message) {
         this.setState({ messageState: message })
@@ -126,50 +136,61 @@ export default class PluginInstalledSuccessfully extends React.Component {
 
         this.setState({ isThereError: true, errorMessage: message })
     }
-    /**
-     * 
-     * @param {PreProcessedTransaction[]} data 
-     */
-    async saveUnkown(data) {
-        console.log("Nombre de transactions inconnues : " + data.length)
-        if (data.length > 0) {
-            console.log("Envoyons la requete de création des transactions inconnues")
-            const res = await bulkCreateUnknowTransactions(data);
-            console.log(res.data)
-        }
 
-    }
     /**
      * 
      * @param {PreProcessedTransaction[]} data 
      * @returns 
      */
     async getOMEfinancialInformations(data) {
-        //try {
-        console.log("Trions les transactions ")
 
         const transactionsOM = data.filter(t => (t.operator == operators[0].address));
         const transactionsMOMO = data.filter(t => (t.operator == operators[1].address));
+
+        // console.warn( "Voici les transactions momo " + transactionsMOMO.length);
+        // console.log(transactionsMOMO)
+
+        const tWithPhone = transactionsMOMO.filter(t => ( t.initialType == "Retrait"))
+        console.warn("Voici les sms OM avec numero");
+        let tv = tWithPhone.map(el => ({ "montant": el.amount,  'numTelSender' : el.senderPhoneNumber , "numTelReceiver" : el.receiverPhoneNumber,  "typeInitial": el.initialType, "flux": el.flux, "sms": el.baseSMS.body }))
+        tv.forEach(el => {
+            console.log(" ")
+            console.log(el)
+        })
         const numbresOrange = getNumbrefromTransactions(transactionsOM);
         console.log("Voici les numeros Orange ")
         console.log(numbresOrange)
         const numbersMTN = getNumbrefromTransactions(transactionsMOMO);
         console.log("Voici les numeros  MTN ")
         console.log(numbersMTN)
+
         try {
-            this.updateStateMessage("Création des comptes automatiques...")
             await sendCreateCompteFinancier("Cash1", "", "Espece")
-            this.updateStateMessage("Comptes Espèces crées, Création des comptes Mobiles...")
-            await this.setUpAccount(operators[0].address, transactionsOM, numbresOrange);
-    
-            await this.setUpAccount(operators[1].address, transactionsMOMO, numbersMTN);
-    
-            console.log("On a terminé l'initialisation")
         } catch (error) {
-            //onsole.log()
-            //this.updateStateMessage("Il semblerait qu'il yait déjà un coptes ...")
+            this.updateStateMessage("Une érreur est survennue lors de la création du compte espèce, veuillez patienter...");
+
+            // réesseyons
+            // let nombreTentative = 1;
+            // const retryCreateCompte = async (retryId) => {
+            //     try {
+            //         if (nombreTentative > 3) {
+            //             clearInterval(retryId);
+            //             return this.updateStateMessage("Une erreur majeure est survennue, retenter dans 10 min");
+
+            //         }
+            //         nombreTentative++;
+            //         await sendCreateCompteFinancier("Cash1", "", "Espece");
+            //         return clearInterval(retryId);
+
+            //     } catch (error) {
+            //         retryCreateCompte(retryId)
+            //     }
+            // }
+            // const retryId = setInterval(() => {
+            //     retryCreateCompte(retryId)
+            // }, 10000);
         }
-        
+
 
         let compteOrange = undefined;
         let compteMTN = undefined;
@@ -202,81 +223,14 @@ export default class PluginInstalledSuccessfully extends React.Component {
         }
 
         const OMEInfo = {
-            orangeNumber: (compteOrange) ? compteOrange.numero : "-",
-            orangeSommeEntree: (compteOrange) ? compteOrange.sommeEntree : 0,
-            orangeSommeSortie: (compteOrange) ? compteOrange.sommeSortie : 0,
-            mtnNumber: (compteMTN) ? compteMTN.numero : "-",
-            mtnSommeEntree: (compteMTN) ? compteMTN.sommeEntree : 0,
-            mtnSommeSortie: (compteMTN) ? compteMTN.sommeSortie : 0,
+            orangeNumber: (compteOrange) ? toNumberFormat (compteOrange.numero) : "-",
+            orangeSommeEntree: (compteOrange) ? toAmountFormat(compteOrange.sommeEntree) : 0,
+            orangeSommeSortie: (compteOrange) ? toAmountFormat(compteOrange.sommeSortie) : 0,
+            mtnNumber: (compteMTN) ? toNumberFormat(compteMTN.numero) : "-",
+            mtnSommeEntree: (compteMTN) ? toAmountFormat(compteMTN.sommeEntree) : 0,
+            mtnSommeSortie: (compteMTN) ? toAmountFormat(compteMTN.sommeSortie) : 0,
         }
         return OMEInfo;
-
-    }
-    /**
-     * 
-     * @param {*} operator 
-     * @param {PreProcessedTransaction[]} data 
-     */
-    async setUpAccount(operator, data, numbers) {
-        try {
-            if (data.length > 0) {
-                console.log("On a des transacions " + operator)
-                console.log(data);
-
-
-                if (numbers.length < 2) {
-
-                    console.log("On au moins Un numéro " + operator)
-                    this.updateStateMessage("Création du compte automatique " + operator + " ...")
-
-                    console.log(numbers)
-                    let res = await sendCreateCompteFinancier(operator, (numbers.length == 1) ? numbers[0] : "", "Mobile");
-                    this.updateStateMessage("Création du compte automatique " + operator + " crées avec succès \nEnregistrement des transactions auto ")
-                    const idCompte = res.data.data.idCompte;
-                    console.log(res.data.data);
-                    console.log(idCompte);
-
-                    let finalTransactions = (numbers.length == 1) ? data.map((el) => ({ ...el, accountId: idCompte })) : data
-
-                    const result = await bulkCreateTransactions(finalTransactions);
-                    this.updateStateMessage("Création des transactions auto réussis ...")
-                    console.log(result.data)
-                } else {
-                    console.log("On a " + numbers.length.toString() + " numéro " + operator);
-
-                    let comptes = [];
-                    for (const number of numbers) {
-                        let c = {
-                            numero: number,
-                            operateur: operator
-                        }
-                        comptes.push(c)
-                    }
-                    console.log("Envoi de la requete de création des comptes " + operator)
-                    this.updateStateMessage("Création des comptes " + operator + " ...")
-                    await sendBulkCreateCompteFinancier(comptes, "Mobile")
-
-                    try {
-                        /**
-                         * @type {any[]}
-                         */
-                        const accounts = await getAllAccoount();
-                        
-                        for (const account of accounts) {
-                            createAccountOnAdalo(account);
-                        }
-
-                    } catch (error) {
-                        console.log("Erreur lors de la création des comptes Adalo")
-                    }   
-
-                    this.updateStateMessage("Fin de la Création des comptes " + operator + " ! ")
-                }
-            }
-        } catch (error) {
-            console.log("une erreur s'est produite lors de la création des comptes")
-            console.log(error)
-        }
 
     }
 

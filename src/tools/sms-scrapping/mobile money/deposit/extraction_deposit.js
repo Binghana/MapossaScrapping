@@ -1,8 +1,8 @@
-import {amountKeywords ,feeKeywords,transactionIDKeywords , balanceKeywords }  from "../keywords"
-import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword  } from "../functions";
-import { PreProcessedTransaction } from "../preProcessedTransactions";
+import {amountKeywords ,feeKeywords,transactionIDKeywords , balanceKeywords , senderUserNameKeywords , senderPhoneNumberKeywords }  from "./keywords_deposit"
+import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword  , getUserName } from "../../functions";
+import { PreProcessedTransaction } from "../../preProcessedTransactions";
 /**
- * Transforme un sms identifé comme étant un retrait de Mobile Money
+ * Transforme un sms identifé comme étant un dépot de Mobile Money
  * En une transaction prétraitée de Mapossa
  * @param {object} sms un object représentnt le sms que l'on souhaite transformer en transaction
  * @param {PreProcessedTransaction} preProcessedTransaction un object qui représente la transaction
@@ -10,10 +10,10 @@ import { PreProcessedTransaction } from "../preProcessedTransactions";
  * @returns {object} une transaction prétraitées
  */
 
- export function scrapWithdrawalMOMO( sms , preProcessedTransaction ) {
+export function scrapDepositMoMo( sms , preProcessedTransaction ) {
 
-    preProcessedTransaction.initialType = "Retrait";
-    preProcessedTransaction.flux = "Sortant";
+    preProcessedTransaction.initialType = "Depot";
+    preProcessedTransaction.flux = "Entrant";
     preProcessedTransaction.amount = getNumberFromKeyword(amountKeywords , sms.body);
     preProcessedTransaction.fees = getNumberFromKeyword(feeKeywords , sms.body );
     preProcessedTransaction.date= getDateFromSMS(sms);
@@ -21,12 +21,8 @@ import { PreProcessedTransaction } from "../preProcessedTransactions";
    
     preProcessedTransaction.balance = getNumberFromKeyword( balanceKeywords , sms.body  );
     preProcessedTransaction.transactionID = getNumberFromKeyword ( transactionIDKeywords , sms.body );
+    preProcessedTransaction.senderName = getUserName ( senderUserNameKeywords , sms.body );
+    preProcessedTransaction.senderPhoneNumber = getNumberFromKeyword ( senderPhoneNumberKeywords , sms.body )
 
-
-    preProcessedTransaction.amount_error = ( preProcessedTransaction.amount == -1);
-    preProcessedTransaction.fees_error = (preProcessedTransaction.fees == -1);
-    preProcessedTransaction.balance_error = (preProcessedTransaction.balance == -1);
-
-    preProcessedTransaction.checkError();
     return preProcessedTransaction;
 }

@@ -67,14 +67,14 @@ export default class PreviewOfResult extends React.Component {
                                         <Text style={styles.textTypeFinal}>Entrant</Text>
                                         <View style={styles.flux}>
                                             <Image style={styles.logoMin} source={imgArrowDown} />
-                                            <Text style={styles.textMontant}> {this.state.orange.sommeEntree} FCFA</Text>
+                                            <Text style={styles.textMontant}> {this.state.orange.sommeEntree} <Text style={styles.lowText}> FCFA</Text></Text>
                                         </View>
                                     </View>
                                     <View style= {styles.soloFlux}>
                                         <Text style={styles.textTypeFinal}>Sortant</Text>
                                         <View style={styles.flux}>
                                             <Image style={styles.logoMin} source={imgArrowUp} />
-                                            <Text style={styles.textMontant}> {this.state.orange.sommeSortie} FCFA</Text>
+                                            <Text style={styles.textMontant}> {this.state.orange.sommeSortie} <Text style={styles.lowText}> FCFA</Text></Text>
                                         </View>
                                     </View>
                                     
@@ -94,17 +94,17 @@ export default class PreviewOfResult extends React.Component {
                                 <Text style={styles.textNumero}> {this.state.mtn.numero} </Text>
                                 <View style={styles.boxFlux}>
                                     <View style= {styles.soloFlux}>
-                                        <Text style={styles.textTypeFinal}>Entrant</Text>
+                                        <Text style={styles.textTypeFinal}>Entrant </Text>
                                         <View style={styles.flux}>
                                             <Image style={styles.logoMin} source={imgArrowDown} />
-                                            <Text style={styles.textMontant}> {this.state.mtn.sommeEntree} FCFA</Text>
+                                            <Text style={styles.textMontant}> {this.state.mtn.sommeEntree} <Text style={styles.lowText}> FCFA</Text></Text> 
                                         </View>
                                     </View>
                                     <View style= {styles.soloFlux}>
                                         <Text style={styles.textTypeFinal}>Sortant</Text>
                                         <View style={styles.flux}>
                                             <Image style={styles.logoMin} source={imgArrowUp} />
-                                            <Text style={styles.textMontant}> {this.state.mtn.sommeSortie} FCFA</Text>
+                                            <Text style={styles.textMontant}> {this.state.mtn.sommeSortie} <Text style={styles.lowText}> FCFA</Text> </Text>
                                         </View>
                                     </View>
                                    
@@ -127,6 +127,9 @@ export default class PreviewOfResult extends React.Component {
     }
 }
 const styles = StyleSheet.create({
+    lowText : {
+        fontSize : 9
+    },
     soloFlux : {
         // borderWidth : 1,
         // borderColor : "blue",
@@ -187,7 +190,7 @@ const styles = StyleSheet.create({
         backgroundColor: "white"
     },
     boxCentral: {
-        marginHorizontal: '8%',
+        marginHorizontal: '4%',
         alignSelt: 'center',
 
     },

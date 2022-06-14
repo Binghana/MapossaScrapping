@@ -4,130 +4,171 @@ import { PreProcessedTransaction } from "./preProcessedTransactions"
 import { matchModel } from "./models";
 import { isGoodNumTelCameroon } from "../verification/RegExp";
 import { getNumberFromKeyword } from "./functions";
-import { senderPhoneNumberKeywords } from "./keywords";
-/**
- * 
+import { senderPhoneNumberKeywords }  from "./mobile money/deposit/keywords_deposit";
+//import { senderPhoneNumberKeywords } from "./mobile money/transfertIn/extraction_transfertIn";
+import { sendCreateCompteFinancier } from "../../services/API/mapossaDataTech/CompteFinanciers";
+
+/** 
  * @param {SMS[]} smsArray 
  */
-export default function scrap(smsArray, errfunction = () => { }) {
-
-    if (smsArray.length < 1) {
-
-        console.log("L'utilisateur n'as pas de sms")
-        return null;
-    }
-
-    console.log("on a " + smsArray.length.toString() + " sms , esseyons de scraper");
+export default async function scrap(smsArray) {
 
     /**
      * @type {PreProcessedTransaction[]}
      */
-    const preProcessedTransactions = [];
-    /**
-     * @type {PreProcessedTransaction[]}
-     */
-    const unknownPreProcessedTransactions = [];
+    let preProcessedTransactions = [];
+
     try {
-        for (const sms of smsArray) {
 
-            // identification
+        for (const operator of operators) {
 
-            //if (! identification (sms , operators)) 
+            // on récupère les sms dont l'adress
 
-            for (const operator of operators) {
+            const smsOperator = smsArray.filter(sms => sms.address == operator.address);
+            
+            if (smsOperator.length < 1) {
+                continue;
+            }
+            // creation du compte financier de l'opérateur de l'utilisateur
+            try {
 
-                if (sms.address == operator.address) {
+                const res = await sendCreateCompteFinancier(operator.address, "", "Mobile");
+                //console.log(res.data)
+                if (res.data.data && res.data.data.idCompte) {
+                    operator.id == res.data.data.idCompte;
+                }
+            } catch (error) {
+                //console.log("Une érreur est survennue lors de la création du compte financier automatique, veuillez patienter...");
 
-                    //console.log(sms)
-                    let preProcessedTransaction = new PreProcessedTransaction(sms);
-                    //console.log("L'operateur est : " + operator.name)
-                    preProcessedTransaction.operator = operator.address;
+                // réesseyons
+                // let nombreTentative = 1;
+                // const retryCreateCompte = async (retryId) => {
+                //     try {
+                //         if (nombreTentative > 3) {
+                //             clearInterval(retryId);
+                //             //console.log("Une erreur majeure est survennue, retenter dans 10 min");
+                //             return new Error("Impossible de créer le compte financier " + operator.address + " de l'utilisateur")
 
-                    if (operator.serviceCenter.includes(sms.service_center)) {
+                //         }
+                //         nombreTentative++;
+                //         await sendCreateCompteFinancier(operator.address, "", "Mobile");
+                //         //console.log(res.data)
+                //         if (res.data.data && res.data.data.idCompte) {
+                //             operator.id == res.data.data.idCompte;
+                //             return clearInterval(retryId);
+                //         }
+                //     } catch (error) {
+                //         retryCreateCompte(retryId)
+                //     }
+                // }
+                // const retryId = setInterval(() => {
+                //     retryCreateCompte(retryId)
+                // }, 10000);
+            }
 
-                        for (const typeInitial in operator.typeInitial) {
-
-                            if (Object.hasOwnProperty.call(operator.typeInitial, typeInitial)) {
-
-                                // console.log("Voici le type initial hors de la boucled")
-                                // console.log(typeInitial);
-
-                                const typeInit = operator.typeInitial[typeInitial];
-                                // console.log("voici le type Initila questionné");
-                                // console.log(typeInit)
-
-                                if (operator.address == operators[1].address && (typeInitial == "depot" || typeInitial == "transfertEntrant")) {
-                                    console.log("C'est un sms " + typeInitial)
-                                    if (isMOMODeposit(typeInit.modelFR, sms.body) || isMOMODeposit(typeInit.modelEN, sms.body)) {
-
-                                        operators[1].scrap.depot(sms, preProcessedTransaction);
-
-                                    }
-                                     else {
-                                         console.log("Scarpons avec transfert entrant")
-                                        operators[1].scrap.transfertEntrant(sms , preProcessedTransaction);
-                                        console.log("Fin FIN FIN")
-                                    }
-                                
-                                    preProcessedTransactions.push(preProcessedTransaction)
-                                } else
-                                    if (matchModel(typeInit.modelFR, sms.body) ||
-                                        (("modelEN" in typeInit) && matchModel(typeInit.modelEN, sms.body))) {
-                                        console.log("La transaction correspond au model : " + typeInitial)
-                                        console.log(typeInitial)
-                                        let t;
-                                        if (("modelEN" in typeInit) && matchModel(typeInit.modelEN, sms.body)) {
-                                            try {
-                                                t = operator.scrap[typeInitial](sms, preProcessedTransaction)
-                                            } catch (error) {
-                                                console.log(error);
-                                                console.log("Une erreur l'utilisation de la fonction de découpage avec le sms MOMO anglais")
-                                            }
-                                        } else {
-                                            t = operator.scrap[typeInitial](sms, preProcessedTransaction)
-                                        }
+            // Transformation
+            /**
+             * @type {PreProcessedTransaction[]}
+             */
+            const preProcessedTransactionOperator = [];
+            // 1. parcours
+            let i = 0;
+            for (const sms of smsOperator) {
 
 
+                const preProTran = new PreProcessedTransaction(sms, operator.address, sms.service_center);
 
-                                        preProcessedTransactions.push(preProcessedTransaction)
-                                        //const t = operator.scrap[typeInit](sms)
-                                        // console.log("On a extrait les données de la transactions : ")
-                                        // console.log(t)
+                // vérification
 
-                                    } else {
-                                        console.log("On a un souci de classification avec ce sms : ");
-                                        console.log(sms)
+                if (!operator.serviceCenter.includes(sms.service_center)) {
+                    preProTran.risk = true;
+                    preProcessedTransactionOperator.push(preProTran);
+                    continue;
+                }
 
-                                        preProcessedTransaction.classification_error = true;
+                preProTran.risk = false;
 
-                                        console.log(preProcessedTransaction)
-                                        unknownPreProcessedTransactions.push(preProcessedTransaction);
-                                    }
+                // classification
+                let matchOneModel = false;
+
+
+
+
+                for (const typeInitial in operator.typeInitial) {
+                    if (Object.hasOwnProperty.call(operator.typeInitial, typeInitial)) {
+                        const models = operator.typeInitial[typeInitial];
+
+
+                        if (operator.address == operators[1].address) {
+
+                            if (typeInitial == "depot" && (isMOMODeposit(models.modelFR, sms.body) || isMOMODeposit(models.modelEN, sms.body))) {
+                                operator.scrap.depot(sms, preProTran)
+                                preProTran.problem = false;
+                                preProcessedTransactionOperator.push(preProTran);
+                                matchOneModel = true;
+                                break;
+                            }
+
+                            if (typeInitial == "transfertEntrant" && (isMOMOTransfertIn(models.modelFR, sms.body) || isMOMOTransfertIn(models.modelEN, sms.body))) {
+
+                                operator.scrap.transfertEntrant(sms, preProTran)
+                                preProTran.problem = false;
+                                preProcessedTransactionOperator.push(preProTran);
+                                matchOneModel = true;
+                                break;
+
+                            }
+
+                        }
+
+
+
+
+                        if (matchModel(models.modelFR, sms.body) ||
+                            (("modelEN") in models) && matchModel(models.modelEN, sms.body)) {
+                            preProTran.error = false;
+
+                            try {
+                                operator.scrap[typeInitial](sms, preProTran);
+                                preProTran.problem = false;
+                                preProcessedTransactionOperator.push(preProTran);
+
+                            } catch (error) {
+
+                                console.log("Une erreur d'extraction est survennue dans " + operator.address + " sur le type initial : " + typeInitial)
+
+                            } finally {
+                                matchOneModel = true;
+                                break;
                             }
                         }
 
 
-                    } else {
-                        console.log("On a un soucis de vérification")
-                        console.log("Voici le service de l'operateur " + operator.serviceCenter[0]);
-                        console.log("Voici le service center du sms : " + sms.service_center);
-                        preProcessedTransaction.hasError = true;
-                        preProcessedTransaction.verification_error = true;
-                        unknownPreProcessedTransactions.push(preProcessedTransaction);
+
 
                     }
                 }
+
+
+                // si le sms ne match aucun model
+                if (!matchOneModel) {
+                    
+                    preProTran.error = true;
+                    preProcessedTransactionOperator.push(preProTran);
+                    continue;
+                }
+
+
             }
 
-        }
-        return {
-            "preProcessedTransaction": preProcessedTransactions,
-            "unknownPreProcessedTransactions": unknownPreProcessedTransactions
-        };
-    } catch (error) {
-        errfunction()
-    }
+            preProcessedTransactions = preProcessedTransactions.concat(preProcessedTransactionOperator);
 
+        }
+
+    } catch (error) {
+        //console.log()
+    }
+    return preProcessedTransactions;
 }
 /**
  * 
@@ -149,13 +190,15 @@ export function verification(sms, operator) {
 }
 
 function isMOMODeposit(model, sms) {
-    try {
-        console.log(isGoodNumTelCameroon)
-        return matchModel(model, sms) &&  isGoodNumTelCameroon.test(getNumberFromKeyword(senderPhoneNumberKeywords, sms))
 
-    } catch (error) {
-        console.log("fatal")
-        throw "stop"
-    }
+    return matchModel(model, sms) && isGoodNumTelCameroon.test(getNumberFromKeyword(senderPhoneNumberKeywords, sms))
+
+
+
+}
+function isMOMOTransfertIn(model, sms) {
+
+    return matchModel(model, sms) && (!isGoodNumTelCameroon.test(getNumberFromKeyword(senderPhoneNumberKeywords, sms)))
+
 
 }

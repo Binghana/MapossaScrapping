@@ -28,10 +28,7 @@ function getLogoOperateur(operateur) {
   if (operateur == "Cash1") return "https://firebasestorage.googleapis.com/v0/b/mapossadatatech.appspot.com/o/Billets.png?alt=media&token=aa47789d-c656-4551-9684-bb53e7c0fd73";
 }
 export async function sendCreateCompteFinancier(operateur, numero, typeCompte) {
-
-  console.log(operateur)
-  console.log(numero)
-  console.log(typeCompte)
+  //console.log("Envoi de la requete de création de compte : " +operateur+ " num " + numero +" type " + typeCompte)
   var data = JSON.stringify({
     "nom": numero,
     "numero": numero,

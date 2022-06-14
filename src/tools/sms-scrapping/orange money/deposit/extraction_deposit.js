@@ -1,8 +1,8 @@
-import {amountKeywords ,feeKeywords,transactionIDKeywords , balanceKeywords , senderUserNameKeywords , senderPhoneNumberKeywords }  from "../keywords"
-import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword  , getUserName } from "../functions";
-import { PreProcessedTransaction } from "../preProcessedTransactions";
+import {amountKeywords ,feeKeywords,transactionIDKeywords , balanceKeywords , senderUserNameKeywords , senderPhoneNumberKeywords }  from "./keywords_deposit"
+import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword , getOrangeTransactionID , getUserName } from "../../functions";
+import { PreProcessedTransaction } from "../../preProcessedTransactions";
 /**
- * Transforme un sms identifé comme étant un dépot de Mobile Money
+ * Transforme un sms identifé comme étant un dépot d'Orange Money
  * En une transaction prétraitée de Mapossa
  * @param {object} sms un object représentnt le sms que l'on souhaite transformer en transaction
  * @param {PreProcessedTransaction} preProcessedTransaction un object qui représente la transaction
@@ -10,7 +10,7 @@ import { PreProcessedTransaction } from "../preProcessedTransactions";
  * @returns {object} une transaction prétraitées
  */
 
-export function scrapDepositMoMo( sms , preProcessedTransaction ) {
+ export function scrapDepositOM( sms , preProcessedTransaction ) {
 
     preProcessedTransaction.initialType = "Depot";
     preProcessedTransaction.flux = "Entrant";
@@ -20,14 +20,9 @@ export function scrapDepositMoMo( sms , preProcessedTransaction ) {
     preProcessedTransaction.hour = getHourFromSMS(sms)
    
     preProcessedTransaction.balance = getNumberFromKeyword( balanceKeywords , sms.body  );
-    preProcessedTransaction.transactionID = getNumberFromKeyword ( transactionIDKeywords , sms.body );
+    preProcessedTransaction.transactionID = getOrangeTransactionID ( transactionIDKeywords , sms.body );
     preProcessedTransaction.senderName = getUserName ( senderUserNameKeywords , sms.body );
     preProcessedTransaction.senderPhoneNumber = getNumberFromKeyword ( senderPhoneNumberKeywords , sms.body )
 
-    preProcessedTransaction.amount_error = ( preProcessedTransaction.amount == -1);
-    preProcessedTransaction.fees_error = (preProcessedTransaction.fees == -1);
-    preProcessedTransaction.balance_error = (preProcessedTransaction.balance == -1);
-
-    preProcessedTransaction.checkError();
     return preProcessedTransaction;
 }

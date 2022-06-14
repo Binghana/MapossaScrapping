@@ -1,7 +1,7 @@
-import {amountKeywords ,feeKeywords,transactionIDKeywords , balanceKeywords , senderUserNameKeywords , senderPhoneNumberKeywords , receiverUserNameKeywords , receiverPhoneNumberKeywords}  from "../keywords"
-import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword , getUserName } from "../functions";
-import { PreProcessedTransaction } from "../preProcessedTransactions";
-import { isGoodNumTelCameroon } from "../../verification/RegExp";
+import {amountKeywords ,feeKeywords,transactionIDKeywords , balanceKeywords , senderUserNameKeywords , senderPhoneNumberKeywords , receiverUserNameKeywords , receiverPhoneNumberKeywords}  from "./keywords_transfertOut"
+import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword , getUserName } from "../../functions";
+import { PreProcessedTransaction } from "../../preProcessedTransactions";
+import { isGoodNumTelCameroon } from "../../../verification/RegExp";
 /**
  * Transforme un sms identifé comme étant un transfert sortant de Mobile Money
  * En une transaction prétraitée de Mapossa
@@ -25,18 +25,9 @@ import { isGoodNumTelCameroon } from "../../verification/RegExp";
     preProcessedTransaction.balance = getNumberFromKeyword( balanceKeywords , sms.body  );
     preProcessedTransaction.transactionID = getNumberFromKeyword ( transactionIDKeywords , sms.body );
 
-    preProcessedTransaction.senderName = getUserName ( senderUserNameKeywords , sms.body );
-    preProcessedTransaction.senderPhoneNumber = getNumberFromKeyword ( senderPhoneNumberKeywords , sms.body );
-    
     preProcessedTransaction.receiverName = getUserName ( receiverUserNameKeywords , sms.body );
     preProcessedTransaction.receiverPhoneNumber = getNumberFromKeyword ( receiverPhoneNumberKeywords , sms.body );
 
     preProcessedTransaction.userPhoneNumber = (isGoodNumTelCameroon.test(preProcessedTransaction.senderPhoneNumber)) ? preProcessedTransaction.senderPhoneNumber : null;
-
-    preProcessedTransaction.amount_error = ( preProcessedTransaction.amount == -1);
-    preProcessedTransaction.fees_error = (preProcessedTransaction.fees == -1);
-    preProcessedTransaction.balance_error = (preProcessedTransaction.balance == -1);
-
-    preProcessedTransaction.checkError();
     return preProcessedTransaction;
 }

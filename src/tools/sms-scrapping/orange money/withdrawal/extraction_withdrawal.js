@@ -1,6 +1,6 @@
-import {amountKeywords ,feeKeywords,transactionIDKeywords , balanceKeywords}  from "../keywords";
-import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword } from "../functions";
-import { PreProcessedTransaction } from "../preProcessedTransactions";
+import {amountKeywords ,feeKeywords,transactionIDKeywords , balanceKeywords}  from "./keywords_withdrawal";
+import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword } from "../../functions";
+import { PreProcessedTransaction } from "../../preProcessedTransactions";
 /**
  * Transforme un sms identifé comme étant un retrait d'Orange Money
  * En une transaction prétraitée de Mapossa
@@ -21,10 +21,5 @@ import { PreProcessedTransaction } from "../preProcessedTransactions";
     preProcessedTransaction.balance = getNumberFromKeyword( balanceKeywords , sms.body  );
     preProcessedTransaction.transactionID = getNumberFromKeyword ( transactionIDKeywords , sms.body );
 
-
-    preProcessedTransaction.amount_error = ( preProcessedTransaction.amount == -1);
-    preProcessedTransaction.fees_error = (preProcessedTransaction.fees == -1);
-    preProcessedTransaction.balance_error = (preProcessedTransaction.balance == -1);
-    preProcessedTransaction.checkError();
     return preProcessedTransaction;
 }

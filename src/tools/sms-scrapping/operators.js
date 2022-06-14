@@ -1,13 +1,13 @@
-import { scrapInternetCreditMOMO } from "./mobile money/internetCredit";
-import { scrapTransfertInMOMO } from "./mobile money/transferIn";
-import { scrapTransfertOutMOMO } from "./mobile money/transferOut";
-import { scrapWithdrawalMOMO } from "./mobile money/withdrawal";
+import { scrapInternetCreditMOMO } from "./mobile money/internetCredit/extraction_internetCredit";
+import { scrapTransfertInMOMO } from "./mobile money/transfertIn/extraction_transfertIn";
+import { scrapTransfertOutMOMO } from "./mobile money/transfertOut/extraction_transferOut";
+import { scrapWithdrawalMOMO } from "./mobile money/withdrawal/extraction_withdrawal";
 import { modelMOMODeposit, modelMOMODepositEn, modelMOMOPaiementCreditCommunication, modelMOMOPaiementCreditCommunicationEn, modelMOMOPaiementCreditInternet, modelMOMOPaiementCreditInternetEn, modelMOMORetrait, modelMOMORetraitEn, modelMOMOTransfertEntrant, modelMOMOTransfertEntrantEn, modelMOMOTransfertSortant, modelMOMOTransfertSortantEn, modelOMDepot, modelOMPaiementCreditCommunication, modelOMPaiementCreditInternet, modelOMRetrait, modelOMTransfertEntrant, modelOMTransfertSortant } from "./models";
-import { scrapCommunicationCreditOM } from "./orange money/communicationCredit";
-import { scrapInternetCreditOM } from "./orange money/internetCredit";
-import { scrapTransfertInOM } from "./orange money/transferIn";
-import { scrapTransfertOutOM } from "./orange money/transferOut";
-import { scrapWithdrawalOM } from "./orange money/withdrawal";
+import { scrapCommunicationCreditOM } from "./orange money/communicationCredit/extraction_communicationCredit";
+import { scrapInternetCreditOM } from "./orange money/internetCredit/extraction_internetCredit";
+import { scrapTransfertInOM } from "./orange money/transfertIn/extraction_transferIn";
+import { scrapTransfertOutOM } from "./orange money/transfertOut/extraction_transferOut";
+import { scrapWithdrawalOM } from "./orange money/withdrawal/extraction_withdrawal";
 
 export const operators = [
 
@@ -43,7 +43,8 @@ export const operators = [
             paiementCreditInternet : scrapInternetCreditOM,
             paiementCreditCommunication : scrapCommunicationCreditOM,
 
-        }
+        },
+        id : undefined
     },
 
     {
@@ -84,6 +85,7 @@ export const operators = [
             paiementCreditInternet : scrapInternetCreditMOMO,
             paiementCreditCommunication : scrapInternetCreditMOMO,
 
-        }
+        },
+        id : undefined
     }
 ]

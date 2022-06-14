@@ -16,18 +16,23 @@ import { montantWithDecimal, alphaIdNumber, alpa } from "./regexp"
 export function getNumberFromKeyword(keywords, sms) {
 
     for (const keyword of keywords) {
-        if (sms.includes(keyword)) {
+
+        let mots = sms.split(" ")
+        
+        if( mots.includes(keyword)) {
             let position = sms.indexOf(keyword);
             //// console.log("Voici la position du mot clé " + keyword + " : " + position.toString())
             let splitedSms = sms.substring(position);
             //// console.log("Voici la partie qui suit le mot clé : ");
             //// console.log(splitedSms);
-
-
+            
             let allNumbers = splitedSms.match(montantWithDecimal);
             let finalNumber = parseFloat(allNumbers[0], 10);
             return finalNumber
         }
+        
+            
+        
     }
     return -1;
 }
@@ -74,7 +79,7 @@ export function getUserName(keywords, sms) {
                 if (sms.includes(keyword.start) && sms.includes(keyword.end)) {
 
                     let positionStart = sms.indexOf(keyword.start) + keyword.start.length;
-                    console.log("Voici la position du mot clé de début " + keyword.start + " : " + positionStart.toString())
+                    //console.log("Voici la position du mot clé de début " + keyword.start + " : " + positionStart.toString())
                     let positionEnd = sms.indexOf(keyword.end);
 
                     // console.log("Voici la position du mot clé de fin " + keyword.end + " : " + positionEnd.toString())

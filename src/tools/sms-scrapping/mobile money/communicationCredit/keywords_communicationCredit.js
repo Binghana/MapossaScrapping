@@ -3,19 +3,19 @@
  */
  export const amountKeywords = [
     'Montant',
-    'Montant de transaction',
-    'Montant Transaction',
-    'Montant de la transaction',
+   //  'Montant de transaction',
+   //  'Montant Transaction',
+   //  'Montant de la transaction',
     'withdrawn',
-    'retrait de',
+    'retrait',
     'recu',
     'received',
     'transferred',
-    'Transfert de',
-    'A transaction of',
-    'Une transaction de',
-    'payment of',
-    'Votre paiement de'
+    'Transfert',
+    'transaction',
+    //'Une transaction de',
+    'payment',
+    'paiement'
 ];
 
 /**
