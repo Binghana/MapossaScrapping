@@ -1,6 +1,7 @@
-import {amountKeywords ,feeKeywords,transactionIDKeywords , balanceKeywords , senderUserNameKeywords , senderPhoneNumberKeywords }  from "./keywords_deposit"
-import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword  , getUserName } from "../../functions";
+import { amountKeywords ,balanceKeywords,feeKeywords,receiverPhoneNumberKeywords,receiverUserNameKeywords,senderPhoneNumberKeywords,senderUserNameKeywords,transactionIDKeywords } from "./keywords_deposit"
+
 import { PreProcessedTransaction } from "../../preProcessedTransactions";
+import extract from "../../extraction";
 /**
  * Transforme un sms identifé comme étant un dépot de Mobile Money
  * En une transaction prétraitée de Mapossa
@@ -10,19 +11,21 @@ import { PreProcessedTransaction } from "../../preProcessedTransactions";
  * @returns {object} une transaction prétraitées
  */
 
-export function scrapDepositMoMo( sms , preProcessedTransaction ) {
+export function scrapDepositMoMo(sms, preProcessedTransaction) {
 
-    preProcessedTransaction.initialType = "Depot";
-    preProcessedTransaction.flux = "Entrant";
-    preProcessedTransaction.amount = getNumberFromKeyword(amountKeywords , sms.body);
-    preProcessedTransaction.fees = getNumberFromKeyword(feeKeywords , sms.body );
-    preProcessedTransaction.date= getDateFromSMS(sms);
-    preProcessedTransaction.hour = getHourFromSMS(sms)
-   
-    preProcessedTransaction.balance = getNumberFromKeyword( balanceKeywords , sms.body  );
-    preProcessedTransaction.transactionID = getNumberFromKeyword ( transactionIDKeywords , sms.body );
-    preProcessedTransaction.senderName = getUserName ( senderUserNameKeywords , sms.body );
-    preProcessedTransaction.senderPhoneNumber = getNumberFromKeyword ( senderPhoneNumberKeywords , sms.body )
-
-    return preProcessedTransaction;
+    return extract(
+        preProcessedTransaction,
+        "Depot",
+        null,
+        "Entrant",
+        amountKeywords,
+        feeKeywords,
+        balanceKeywords,
+        senderUserNameKeywords,
+        senderPhoneNumberKeywords,
+        receiverUserNameKeywords,
+        receiverPhoneNumberKeywords,
+        transactionIDKeywords,
+        sms
+    ) ;
 }

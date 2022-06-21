@@ -36,6 +36,7 @@ export class PreProcessedTransaction {
         this.risk = false;
         this.error = false;
         this.problem = false;
+        this.worry = false;
 
     }
 }

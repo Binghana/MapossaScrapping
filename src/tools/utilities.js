@@ -62,7 +62,7 @@ export function toAmountFormat ( amount ) {
   return pieces.join('')
   //return Intl.NumberFormat("fr-FR").format(amount)
   //return Intl.NumberFormat('fr-FR').format(amount)
-  return amount
+
 }
 
 /**

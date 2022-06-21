@@ -1,6 +1,6 @@
-import {amountKeywords ,feeKeywords,transactionIDKeywords , balanceKeywords}  from "./keywords_withdrawal";
-import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword } from "../../functions";
+import {amountKeywords ,balanceKeywords,feeKeywords,receiverPhoneNumberKeywords,receiverUserNameKeywords,senderPhoneNumberKeywords,senderUserNameKeywords,transactionIDKeywords}  from "./keywords_withdrawal";
 import { PreProcessedTransaction } from "../../preProcessedTransactions";
+import extract from "../../extraction";
 /**
  * Transforme un sms identifé comme étant un retrait d'Orange Money
  * En une transaction prétraitée de Mapossa
@@ -11,15 +11,20 @@ import { PreProcessedTransaction } from "../../preProcessedTransactions";
  */
 
  export function scrapWithdrawalOM( sms , preProcessedTransaction ) {
-    preProcessedTransaction.initialType = "Retrait";
-    preProcessedTransaction.flux = "Sortant";
-    preProcessedTransaction.amount = getNumberFromKeyword(amountKeywords , sms.body);
-    preProcessedTransaction.fees = getNumberFromKeyword(feeKeywords , sms.body );
-    preProcessedTransaction.date= getDateFromSMS(sms);
-    preProcessedTransaction.hour = getHourFromSMS(sms)
-   
-    preProcessedTransaction.balance = getNumberFromKeyword( balanceKeywords , sms.body  );
-    preProcessedTransaction.transactionID = getNumberFromKeyword ( transactionIDKeywords , sms.body );
 
-    return preProcessedTransaction;
+    return extract(
+        preProcessedTransaction,
+        "Retrait",
+        null,
+        "Sortant",
+        amountKeywords,
+        feeKeywords,
+        balanceKeywords,
+        senderUserNameKeywords,
+        senderPhoneNumberKeywords,
+        receiverUserNameKeywords,
+        receiverPhoneNumberKeywords,
+        transactionIDKeywords,
+        sms
+    ) ;
 }

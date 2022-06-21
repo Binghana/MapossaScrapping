@@ -13,7 +13,7 @@
    //  'transferred',
    //  'Transfert',
    //  'transaction',
-    //'Une transaction de',
+   //'Une transaction de',
    //  'payment',
    //  'paiement'
 ];
@@ -33,15 +33,15 @@
  * @type {string[]}
  */
  export const balanceKeywords = [
-    'Your new balance:',
-    'Votre nouveau solde est de:',
+    'Your new balance ',
+    'Votre nouveau solde est de ',
     'Nouveau solde',
     'Nouveau solde est',
     'Votre nouveau solde',
-    'Nouveau solde:',
-    'Nouveau Solde:',
-    'Nouveau Solde :',
-    'Solde:',
+    'Nouveau solde ',
+    'Nouveau Solde ',
+    'Nouveau Solde  ',
+    'Solde',
 ];
 
 /**
@@ -58,7 +58,6 @@
  * @type {string[]}
  */
  export const senderPhoneNumberKeywords = [
-   'via agent',
    'from',
    'to',
    'par',
@@ -68,12 +67,12 @@
  * @type {string[]}
  */
  export const transactionIDKeywords = [
-    'Financial Transaction Id:',
+    'Financial Transaction Id ',
     'Transaction Id',
-    'Transaction ID:',
+    'Transaction ID ',
     'No de transaction',
-    'ID transaction :',
-    'ID transaction:'
+    'ID transaction  ',
+    'ID transaction '
 ];
 
 /**

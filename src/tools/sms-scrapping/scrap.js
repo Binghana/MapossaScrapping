@@ -1,10 +1,10 @@
 import { operators } from "./operators";
 import { SMS } from "./sms";
 import { PreProcessedTransaction } from "./preProcessedTransactions"
-import { matchModel } from "./models";
+import { matchImerativeModel, matchModel } from "./models";
 import { isGoodNumTelCameroon } from "../verification/RegExp";
 import { getNumberFromKeyword } from "./functions";
-import { senderPhoneNumberKeywords }  from "./mobile money/deposit/keywords_deposit";
+import { senderPhoneNumberKeywords } from "./mobile money/deposit/keywords_deposit";
 //import { senderPhoneNumberKeywords } from "./mobile money/transfertIn/extraction_transfertIn";
 import { sendCreateCompteFinancier } from "../../services/API/mapossaDataTech/CompteFinanciers";
 
@@ -25,7 +25,7 @@ export default async function scrap(smsArray) {
             // on récupère les sms dont l'adress
 
             const smsOperator = smsArray.filter(sms => sms.address == operator.address);
-            
+
             if (smsOperator.length < 1) {
                 continue;
             }
@@ -73,15 +73,20 @@ export default async function scrap(smsArray) {
             const preProcessedTransactionOperator = [];
             // 1. parcours
             let i = 0;
+
             for (const sms of smsOperator) {
-
-
+           
                 const preProTran = new PreProcessedTransaction(sms, operator.address, sms.service_center);
 
                 // vérification
 
                 if (!operator.serviceCenter.includes(sms.service_center)) {
                     preProTran.risk = true;
+
+                    if (!matchImerativeModel(sms.body)){
+                        continue;
+                    }
+
                     preProcessedTransactionOperator.push(preProTran);
                     continue;
                 }
@@ -90,9 +95,6 @@ export default async function scrap(smsArray) {
 
                 // classification
                 let matchOneModel = false;
-
-
-
 
                 for (const typeInitial in operator.typeInitial) {
                     if (Object.hasOwnProperty.call(operator.typeInitial, typeInitial)) {
@@ -120,11 +122,8 @@ export default async function scrap(smsArray) {
                             }
 
                         }
-
-
-
-
-                        if (matchModel(models.modelFR, sms.body) ||
+                       
+                        if (matchModel(models.modelFR, sms.body , ("otherModels" in models)? models.otherModels : []) ||
                             (("modelEN") in models) && matchModel(models.modelEN, sms.body)) {
                             preProTran.error = false;
 
@@ -134,7 +133,7 @@ export default async function scrap(smsArray) {
                                 preProcessedTransactionOperator.push(preProTran);
 
                             } catch (error) {
-
+                                console.error(error)
                                 console.log("Une erreur d'extraction est survennue dans " + operator.address + " sur le type initial : " + typeInitial)
 
                             } finally {
@@ -142,17 +141,19 @@ export default async function scrap(smsArray) {
                                 break;
                             }
                         }
-
-
-
-
+              
                     }
                 }
 
 
                 // si le sms ne match aucun model
                 if (!matchOneModel) {
-                    
+
+
+                    if (!matchImerativeModel(sms.body)) {
+                        continue;
+                    }
+
                     preProTran.error = true;
                     preProcessedTransactionOperator.push(preProTran);
                     continue;
@@ -193,12 +194,10 @@ function isMOMODeposit(model, sms) {
 
     return matchModel(model, sms) && isGoodNumTelCameroon.test(getNumberFromKeyword(senderPhoneNumberKeywords, sms))
 
-
-
 }
 function isMOMOTransfertIn(model, sms) {
 
     return matchModel(model, sms) && (!isGoodNumTelCameroon.test(getNumberFromKeyword(senderPhoneNumberKeywords, sms)))
 
-
 }
+

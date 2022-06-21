@@ -1,5 +1,6 @@
 
 //import { operators } from "./sms-scrapping/operators";
+import { operators } from "./sms-scrapping/operators";
 import { PreProcessedTransaction } from "./sms-scrapping/preProcessedTransactions";
 //import { isGoodNumTelCameroon } from "./verification/RegExp";
 
@@ -58,10 +59,39 @@ import { PreProcessedTransaction } from "./sms-scrapping/preProcessedTransaction
  * @param {PreProcessedTransaction[]} tabTransaction 
  * @returns 
  */
-export function getNumbrefromTransactions(tabTransaction = []) {
+export function getNumbrefromTransactions(tabTransaction) {
+    let numbers = [];
 
+    for (const transaction of tabTransaction) {
+        if (transaction.flux == "Sortant") {
+            if(transaction.initialType == "Transfert"){
+                numbers.push(transaction.senderPhoneNumber)
+            } 
+            if ( transaction.initialType == "Retrait" && transaction.operator == operators[1].address){
+                numbers.push(transaction.senderPhoneNumber)
+            }
+            
 
-    let numbers = tabTransaction.map(el => el.userPhoneNumber);
+        }else if (transaction.flux == "Entrant") {
+
+            if (transaction.initialType == "Transfert") {
+                numbers.push(transaction.receiverPhoneNumber)
+            }
+        }
+    }
+
+    // "Transfert Sortant MOMO"
+    // preProcessedTransaction.userPhoneNumber = (isGoodNumTelCameroon.test(preProcessedTransaction.senderPhoneNumber)) ? preProcessedTransaction.senderPhoneNumber : null;
+    
+    //"Transfert Entrant MOMO"
+    //preProcessedTransaction.userPhoneNumber = (isGoodNumTelCameroon.test(preProcessedTransaction.receiverPhoneNumber)) ? preProcessedTransaction.receiverPhoneNumber : null;
+
+    // "Transfert Entrant OM"
+    // preProcessedTransaction.userPhoneNumber = preProcessedTransaction.receiverPhoneNumber;
+    
+    // "Transfert Sortant OM"
+    // preProcessedTransaction.userPhoneNumber = preProcessedTransaction.senderPhoneNumber;
+
     numbers = numbers.filter(el => el != null && el>0);
 
     return [...new Set(numbers)];

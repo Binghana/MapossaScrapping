@@ -12,7 +12,7 @@ import SmsAndroid from "react-native-get-sms-android-v2";
 import { filter, isPermissionGranted } from "../../tools/SMS/AskPermissions";
 import ScrappingError from "../../tools/error/ScrappingError";
 import scrap from "../../tools/sms-scrapping/scrap.js"
-import { getAllAccoount, getUserAllCompteFinanciers, sendBulkCreateCompteFinancier, sendCreateCompteFinancier } from "../../services/API/mapossaDataTech/CompteFinanciers";
+import { getAllAccoount, getUserAllCompteFinanciers, sendBulkCreateCompteFinancier, sendCreateCompteFinancier, updateAccount } from "../../services/API/mapossaDataTech/CompteFinanciers";
 
 
 import { getUserCredentials, storage, storageKey, toAmountFormat, toNumberFormat } from "../../tools/utilities";
@@ -24,6 +24,7 @@ import { PreProcessedTransaction } from "../../tools/sms-scrapping/preProcessedT
 import { bulkCreateTransactions, bulkCreateUnknowTransactions } from "../../services/API/mapossaDataTech/Transactions";
 import { ERROR_NO_NETWORK } from "../../tools/error/ErrorMessages";
 import { createAccountOnAdalo } from "../../services/API/adalo/comptefinancier";
+import { savePreProcessedtransaction } from "../../tools/fileSystem/fs";
 
 const loading = require("../../ressources/images/loader.gif");
 export default class PluginInstalledSuccessfully extends React.Component {
@@ -68,6 +69,8 @@ export default class PluginInstalledSuccessfully extends React.Component {
                         //this.updateStateMessage("Nous avons terminé de sauvegardé les inconnues")
                         // console.log(results)
                         // console.log("voici le résultat plus haut")
+                        await savePreProcessedtransaction(results);
+                        
                         if (!this.verifyPreProcessedTransactions(results)) return this.gotToPage("NoFinancialSMS");
                         this.updateStateMessage("Nous traitements et rangements des flux par OME")
                         const OMEInfo = await this.getOMEfinancialInformations(results);
@@ -147,20 +150,22 @@ export default class PluginInstalledSuccessfully extends React.Component {
         const transactionsOM = data.filter(t => (t.operator == operators[0].address));
         const transactionsMOMO = data.filter(t => (t.operator == operators[1].address));
 
+        const numbersMTN = getNumbrefromTransactions(transactionsMOMO);
+        const numbresOrange = getNumbrefromTransactions(transactionsOM);
         // console.warn( "Voici les transactions momo " + transactionsMOMO.length);
         // console.log(transactionsMOMO)
 
-        const tWithPhone = transactionsMOMO.filter(t => ( t.initialType == "Retrait"))
+        const tWithPhone = transactionsMOMO.filter(t => (t.initialType == "Retrait"))
         console.warn("Voici les sms OM avec numero");
-        let tv = tWithPhone.map(el => ({ "montant": el.amount,  'numTelSender' : el.senderPhoneNumber , "numTelReceiver" : el.receiverPhoneNumber,  "typeInitial": el.initialType, "flux": el.flux, "sms": el.baseSMS.body }))
+        let tv = tWithPhone.map(el => ({ "montant": el.amount, 'numTelSender': el.senderPhoneNumber, "numTelReceiver": el.receiverPhoneNumber, "typeInitial": el.initialType, "flux": el.flux, "sms": el.baseSMS.body }))
         tv.forEach(el => {
             console.log(" ")
             console.log(el)
         })
-        const numbresOrange = getNumbrefromTransactions(transactionsOM);
+
         console.log("Voici les numeros Orange ")
         console.log(numbresOrange)
-        const numbersMTN = getNumbrefromTransactions(transactionsMOMO);
+
         console.log("Voici les numeros  MTN ")
         console.log(numbersMTN)
 
@@ -223,7 +228,7 @@ export default class PluginInstalledSuccessfully extends React.Component {
         }
 
         const OMEInfo = {
-            orangeNumber: (compteOrange) ? toNumberFormat (compteOrange.numero) : "-",
+            orangeNumber: (compteOrange) ? toNumberFormat(compteOrange.numero) : "-",
             orangeSommeEntree: (compteOrange) ? toAmountFormat(compteOrange.sommeEntree) : 0,
             orangeSommeSortie: (compteOrange) ? toAmountFormat(compteOrange.sommeSortie) : 0,
             mtnNumber: (compteMTN) ? toNumberFormat(compteMTN.numero) : "-",
@@ -231,6 +236,39 @@ export default class PluginInstalledSuccessfully extends React.Component {
             mtnSommeSortie: (compteMTN) ? toAmountFormat(compteMTN.sommeSortie) : 0,
         }
         return OMEInfo;
+
+    }
+    /**
+     * 
+     * @param {PreProcessedTransaction[]} transacionsOfOperator 
+     */
+    async unicity(transacionsOfOperator, operator) {
+
+        const numbers = getNumbrefromTransactions(transacionsOfOperator);
+        try {
+            switch (numbers.length) {
+                case 0:
+                    await bulkCreateUnknowTransactions(transacionsOfOperator).catch((err) => { console.error("une erreur est survennue avec la bulk création des à 0") })
+                    break;
+                case 1:
+
+                    await updateAccount(operator.id).catch((err)=>{ console.error("une erreur est survennue avec la bulk création des à 1") })
+                    await bulkCreateUnknowTransactions(transacionsOfOperator.map(el => ({ ...el, accountId: operator.id }))).catch((err) => { console.error("une erreur est survennue avec la bulk création des à 1") })
+                    break;
+
+
+                default:
+                    await bulkCreateUnknowTransactions(transacionsOfOperator).catch((err) => { console.error("une erreur est survennue avec la bulk création des à 2") })
+                    break;
+
+            }
+        } catch (error) {
+            console.error("Une erreur est survennue avec les requetes de création")
+        }
+
+
+
+
 
     }
 

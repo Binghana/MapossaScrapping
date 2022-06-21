@@ -13,8 +13,8 @@ import { montantWithDecimal, alphaIdNumber, alpa } from "./regexp"
  * @returns { number } la valeur du nombre trouvé
  */
 
-export function getNumberFromKeyword(keywords, sms) {
-
+export function getNumberFromKeyword(keywords, sms , attempt = 1) {
+    
     for (const keyword of keywords) {
 
         let mots = sms.split(" ")
@@ -34,7 +34,8 @@ export function getNumberFromKeyword(keywords, sms) {
             
         
     }
-    return -1;
+    
+    return getNumberFromKeywordAfterReplaceTwoPoints( keywords , sms , attempt );
 }
 
 /**
@@ -123,9 +124,9 @@ export function getUserName(keywords, sms) {
 
 
 export function getOrangeTransactionID(keywords, sms) {
-
+    let mots = sms.split(" ")
     for (const keyword of keywords) {
-        if (sms.includes(keyword)) {
+        if (mots.includes(keyword)) {
             let position = sms.indexOf(keyword);
             // console.log("Voici la position du mot clé " + keyword + " : " + position.toString())
             let splitedSms = sms.substring(position);
@@ -141,4 +142,25 @@ export function getOrangeTransactionID(keywords, sms) {
         }
     }
     return -1;
+}
+
+
+/**
+ * Cette fonction trouve un nombre qui suit le mot clés puis retourne sa valeur
+ * Si il ya plusieurs mot clés ça essaye de trouver la position de
+ * chaque mot clé si elle ne trouve pas sa psition, elle passe au mot
+ * clé suivant; si la position d'aucun mot clé est trouvé, elle 
+ * retourne -1
+ * @param {string[]} keywords représente les mot clés
+ * @param {string} sms le sms dans lequel chercher les mots clés
+ * @returns { number } la valeur du nombre trouvé
+ */
+
+export function getNumberFromKeywordAfterReplaceTwoPoints( keywords , sms , attempt ) {
+    if (attempt > 1) {
+        return -1;
+    }
+    const smsWithReplaceByTwoPoints = sms.replace(/:/g, " ");
+    return getNumberFromKeyword(keywords, smsWithReplaceByTwoPoints, 2 );
+
 }

@@ -1,10 +1,11 @@
-import { scrapInternetCreditMOMO } from "./mobile money/internetCredit/extraction_internetCredit";
+
+import { scrapPaymentMOMO } from "./mobile money/payment/extraction_payment.js";
 import { scrapTransfertInMOMO } from "./mobile money/transfertIn/extraction_transfertIn";
 import { scrapTransfertOutMOMO } from "./mobile money/transfertOut/extraction_transferOut";
 import { scrapWithdrawalMOMO } from "./mobile money/withdrawal/extraction_withdrawal";
-import { modelMOMODeposit, modelMOMODepositEn, modelMOMOPaiementCreditCommunication, modelMOMOPaiementCreditCommunicationEn, modelMOMOPaiementCreditInternet, modelMOMOPaiementCreditInternetEn, modelMOMORetrait, modelMOMORetraitEn, modelMOMOTransfertEntrant, modelMOMOTransfertEntrantEn, modelMOMOTransfertSortant, modelMOMOTransfertSortantEn, modelOMDepot, modelOMPaiementCreditCommunication, modelOMPaiementCreditInternet, modelOMRetrait, modelOMTransfertEntrant, modelOMTransfertSortant } from "./models";
-import { scrapCommunicationCreditOM } from "./orange money/communicationCredit/extraction_communicationCredit";
-import { scrapInternetCreditOM } from "./orange money/internetCredit/extraction_internetCredit";
+import { modelMOMODeposit, modelMOMODepositEn , modelMOMOPayment, modelMOMORetrait, modelMOMORetraitEn, modelMOMOTransfertEntrant, modelMOMOTransfertEntrantEn, modelMOMOTransfertSortant, modelMOMOTransfertSortantEn, modelOMDepot, modelOMPaiementCreditCommunication, modelOMPaiementCreditInternet, modelOMPayment, modelOMRetrait, modelOMTransfertEntrant, modelOMTransfertSortant, otherModelMOMOPayment, otherModelOMPayment } from "./models";
+import { scrapPaymentOM } from "./orange money/payment/extraction_payment";
+
 import { scrapTransfertInOM } from "./orange money/transfertIn/extraction_transferIn";
 import { scrapTransfertOutOM } from "./orange money/transfertOut/extraction_transferOut";
 import { scrapWithdrawalOM } from "./orange money/withdrawal/extraction_withdrawal";
@@ -28,20 +29,22 @@ export const operators = [
             depot : {
                 modelFR : modelOMDepot
             },
-            paiementCreditInternet : {
-                modelFR : modelOMPaiementCreditInternet
+            payment : {
+                modelFR : modelOMPayment,
+                otherModels : otherModelOMPayment
             },
-            paiementCreditCommunication : {
-                modelFR : modelOMPaiementCreditCommunication
-            }
+            // paiementCreditCommunication : {
+            //     modelFR : modelOMPaiementCreditCommunication
+            // }
         },
         scrap : {
             retrait : scrapWithdrawalOM,
             transfertEntrant : scrapTransfertInOM,
             transfertSortant : scrapTransfertOutOM,
             depot : scrapWithdrawalOM,
-            paiementCreditInternet : scrapInternetCreditOM,
-            paiementCreditCommunication : scrapCommunicationCreditOM,
+            payment : scrapPaymentOM
+            // paiementCreditInternet : scrapInternetCreditOM,
+            // paiementCreditCommunication : scrapCommunicationCreditOM,
 
         },
         id : undefined
@@ -68,22 +71,27 @@ export const operators = [
                 modelFR : modelMOMODeposit,
                 modelEN : modelMOMODepositEn
             },
-            paiementCreditInternet : {
-                modelFR : modelMOMOPaiementCreditInternet,
-                modelEN : modelMOMOPaiementCreditInternetEn
+            payment : {
+                modelFR : modelMOMOPayment,
+                otherModels : otherModelMOMOPayment
             },
-            paiementCreditCommunication : {
-                modelFR : modelMOMOPaiementCreditCommunication,
-                modelEN : modelMOMOPaiementCreditCommunicationEn
-            }
+            // paiementCreditInternet : {
+            //     modelFR : modelMOMOPaiementCreditInternet,
+            //     modelEN : modelMOMOPaiementCreditInternetEn
+            // },
+            // paiementCreditCommunication : {
+            //     modelFR : modelMOMOPaiementCreditCommunication,
+            //     modelEN : modelMOMOPaiementCreditCommunicationEn
+            // }
         },
         scrap : {
             retrait : scrapWithdrawalMOMO ,
             transfertEntrant : scrapTransfertInMOMO,
             transfertSortant : scrapTransfertOutMOMO,
             depot : scrapWithdrawalMOMO,
-            paiementCreditInternet : scrapInternetCreditMOMO,
-            paiementCreditCommunication : scrapInternetCreditMOMO,
+            payment : scrapPaymentMOMO
+            // paiementCreditInternet : scrapInternetCreditMOMO,
+            // paiementCreditCommunication : scrapInternetCreditMOMO,
 
         },
         id : undefined

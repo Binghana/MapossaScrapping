@@ -108,13 +108,30 @@ export async function sendBulkCreateCompteFinancier(comptes, typeCompte) {
 export async function getAllAccoount() {
   var config = {
     method: 'get',
-    url:  getUrl() + '?typeCompte=Mobile',
+    url: getUrl() + '?typeCompte=Mobile',
     headers: {}
   };
 
   const response = await axios(config)
 
-    return response.data.data;
-  
+  return response.data.data;
+
 }
 
+export async function updateAccount(accountId, data) {
+
+  var dat = JSON.stringify({
+    data
+  });
+
+  var config = {
+    method: 'put',
+    url:  await getUrl() + '/' + accountId,
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    data: dat
+  };
+
+  return axios(config)
+}

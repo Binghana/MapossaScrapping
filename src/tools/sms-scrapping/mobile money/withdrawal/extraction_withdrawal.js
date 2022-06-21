@@ -1,5 +1,5 @@
-import {amountKeywords ,feeKeywords,transactionIDKeywords , balanceKeywords, senderPhoneNumberKeywords }  from "./keywords_withdrawal"
-import { getDateFromSMS ,getHourFromSMS ,  getNumberFromKeyword  } from "../../functions";
+import { amountKeywords, balanceKeywords, feeKeywords, receiverPhoneNumberKeywords, receiverUserNameKeywords, senderPhoneNumberKeywords, senderUserNameKeywords, transactionIDKeywords } from "./keywords_withdrawal"
+import extract from "../../extraction";
 import { PreProcessedTransaction } from "../../preProcessedTransactions";
 /**
  * Transforme un sms identifé comme étant un retrait de Mobile Money
@@ -10,20 +10,21 @@ import { PreProcessedTransaction } from "../../preProcessedTransactions";
  * @returns {object} une transaction prétraitées
  */
 
- export function scrapWithdrawalMOMO( sms , preProcessedTransaction ) {
+export function scrapWithdrawalMOMO(sms, preProcessedTransaction) {
 
-    preProcessedTransaction.initialType = "Retrait";
-    preProcessedTransaction.flux = "Sortant";
-    preProcessedTransaction.amount = getNumberFromKeyword(amountKeywords , sms.body);
-    preProcessedTransaction.fees = getNumberFromKeyword(feeKeywords , sms.body );
-    preProcessedTransaction.date= getDateFromSMS(sms);
-    preProcessedTransaction.hour = getHourFromSMS(sms)
-   
-    preProcessedTransaction.senderPhoneNumber = getNumberFromKeyword( senderPhoneNumberKeywords, sms.body )
-
-    preProcessedTransaction.userPhoneNumber = preProcessedTransaction.senderPhoneNumber;
-    preProcessedTransaction.balance = getNumberFromKeyword( balanceKeywords , sms.body  );
-    preProcessedTransaction.transactionID = getNumberFromKeyword ( transactionIDKeywords , sms.body );
-
-    return preProcessedTransaction;
+    return extract(
+        preProcessedTransaction,
+        "Retrait",
+        null,
+        "Sortant",
+        amountKeywords,
+        feeKeywords,
+        balanceKeywords,
+        senderUserNameKeywords,
+        senderPhoneNumberKeywords,
+        receiverUserNameKeywords,
+        receiverPhoneNumberKeywords,
+        transactionIDKeywords,
+        sms
+    );
 }
